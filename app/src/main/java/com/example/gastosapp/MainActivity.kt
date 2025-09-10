@@ -6,11 +6,26 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.example.gastosapp.presentation.clients.ClientScreen
+import com.example.gastosapp.presentation.expenses.ExpenseScreen
 import com.example.gastosapp.ui.theme.GastosAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,12 +35,33 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+            val navController = rememberNavController()
+
             GastosAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Scaffold(modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        BottomBarNavigation(navController = navController)
+                    }) { innerPadding ->
+
+
+                    NavHost(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
+                        startDestination = "expenses"
+                    ) {
+                        composable("expenses") {
+                            ExpenseScreen()
+                        }
+
+                        composable("clients") {
+                            ClientScreen()
+                        }
+
+                        composable("dashboard") {
+
+                        }
+                    }
                 }
             }
         }
@@ -33,17 +69,42 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun BottomBarNavigation(navController: NavHostController){
+    val items = listOf(
+        BottomNavItem("Expenses", "expenses", icon = R.drawable.expenseicon),
+        BottomNavItem("Clients", "clients", icon = R.drawable.clienticon),
+        BottomNavItem("Dashboard", "dashboard", icon = R.drawable.dashboardicon)
     )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GastosAppTheme {
-        Greeting("Android")
+    NavigationBar {
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+
+        items.forEach { item ->
+            NavigationBarItem(
+                selected = currentRoute == item.route,
+                onClick = {
+                    navController.navigate(item.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                label = { Text(item.label) },
+                icon = {
+                    Icon(
+                        painter = painterResource(id = item.icon),
+                        contentDescription = item.label,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            )
+        }
     }
 }
+
+data class BottomNavItem(val label: String, val route: String, val icon: Int)
+
+
