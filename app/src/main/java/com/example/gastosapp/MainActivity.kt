@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -24,10 +23,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.gastosapp.presentation.products.ProductScreen
 import com.example.gastosapp.presentation.clients.ClientScreen
-import com.example.gastosapp.presentation.expenses.ExpenseScreen
 import com.example.gastosapp.presentation.expenses.MainExpenseScreen
-import com.example.gastosapp.presentation.expenses.PndExpensesScreen
 import com.example.gastosapp.ui.theme.GastosAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -60,6 +58,10 @@ class MainActivity : ComponentActivity() {
                             ClientScreen()
                         }
 
+                        composable("products") {
+                            ProductScreen()
+                        }
+
                         composable("dashboard") {
 
                         }
@@ -75,6 +77,7 @@ fun BottomBarNavigation(navController: NavHostController){
     val items = listOf(
         BottomNavItem("Expenses", "expenses", icon = R.drawable.expenseicon),
         BottomNavItem("Clients", "clients", icon = R.drawable.clienticon),
+        BottomNavItem("Products", "products", icon = R.drawable.dashboardicon),
         BottomNavItem("Dashboard", "dashboard", icon = R.drawable.dashboardicon)
     )
 
