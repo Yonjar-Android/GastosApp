@@ -26,6 +26,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.gastosapp.presentation.clients.ClientScreen
 import com.example.gastosapp.presentation.expenses.ExpenseScreen
+import com.example.gastosapp.presentation.expenses.MainExpenseScreen
+import com.example.gastosapp.presentation.expenses.PndExpensesScreen
 import com.example.gastosapp.ui.theme.GastosAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,7 +53,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = "expenses"
                     ) {
                         composable("expenses") {
-                            ExpenseScreen()
+                            MainExpenseScreen(navController = navController)
                         }
 
                         composable("clients") {
