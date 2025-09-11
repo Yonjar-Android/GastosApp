@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.gastosapp.data.database.entities.ExpenseEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ExpenseDao {
@@ -23,7 +24,7 @@ interface ExpenseDao {
     suspend fun getExpenseById(id: Long): ExpenseEntity?
 
     @Query("SELECT * FROM expenses")
-    suspend fun getAllExpenses(): List<ExpenseEntity>
+    fun getAllExpenses(): Flow<List<ExpenseEntity>>
 
     @Query("SELECT * FROM expenses WHERE clientId = :clientId")
     suspend fun getExpensesByClient(clientId: Long): List<ExpenseEntity>

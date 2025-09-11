@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                         startDestination = "expenses"
                     ) {
                         composable("expenses") {
-                            MainExpenseScreen(navController = navController)
+                            MainExpenseScreen()
                         }
 
                         composable("clients") {

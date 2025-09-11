@@ -3,6 +3,7 @@ package com.example.gastosapp.data.repositories
 import com.example.gastosapp.data.database.dao.ExpenseDao
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 
 class ExpenseRepositoryImp @Inject constructor(
@@ -24,8 +25,8 @@ class ExpenseRepositoryImp @Inject constructor(
         return expenseDao.getExpenseById(id)
     }
 
-    override suspend fun getAllExpenses(): List<ExpenseEntity> {
-        return emptyList()
+    override fun getAllExpenses(): Flow<List<ExpenseEntity>> {
+        return expenseDao.getAllExpenses()
     }
 
     override suspend fun getExpensesByClient(clientId: Long): List<ExpenseEntity> {
