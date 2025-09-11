@@ -10,7 +10,7 @@ import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ProductEntity
 
-@Database(entities = [ClientEntity::class, ProductEntity::class, ExpenseEntity::class], version = 1)
+@Database(entities = [ClientEntity::class, ProductEntity::class, ExpenseEntity::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class GastosDB : RoomDatabase() {
     abstract fun clientDao(): ClientDao

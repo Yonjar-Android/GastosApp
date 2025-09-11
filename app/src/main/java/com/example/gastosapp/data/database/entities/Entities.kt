@@ -48,6 +48,6 @@ data class ExpenseEntity(
     val cost: Double,
     val payment: Double,
     val clientId: Long,
-    val date: LocalDate,
+    val date: Long,
     val status: Boolean = false
 )

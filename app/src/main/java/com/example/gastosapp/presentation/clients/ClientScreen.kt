@@ -1,5 +1,7 @@
 package com.example.gastosapp.presentation.clients
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -40,13 +43,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
 
 @Composable
 fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()){
 
-    val clients = clientViewModel.clients.collectAsState()
+    val clients = clientViewModel.clients.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
 
     // field values
     var firstName by remember { mutableStateOf("") }
@@ -79,15 +85,19 @@ fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()){
 
         Button(
             onClick = {
-                clientViewModel.insertClient(
-                    ClientEntity(
-                        firstName = firstName,
-                        lastName = lastName
+                if (firstName.isEmpty()){
+                    Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
+                } else{
+                    clientViewModel.insertClient(
+                        ClientEntity(
+                            firstName = firstName,
+                            lastName = lastName
+                        )
                     )
-                )
-                // clean values
-                firstName = ""
-                lastName = ""
+                    // clean values
+                    firstName = ""
+                    lastName = ""
+                }
             },
             modifier = Modifier.height(40.dp)
                 .fillMaxWidth(fraction = 0.9f),
@@ -126,6 +136,7 @@ fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()){
 
         if (showEditDialog) {
             DialogClientEdit(
+                context = context,
                 client = clientToModify!!,
                 onDismiss = { showEditDialog = false },
                 onSave = { client ->
@@ -177,6 +188,7 @@ fun ClientItem(client: ClientEntity, openDialog: () -> Unit, openDialogDelete: (
 
 @Composable
 fun DialogClientEdit(
+    context: Context,
     client: ClientEntity,
     onDismiss: () -> Unit,
     onSave: (ClientEntity) -> Unit
@@ -212,7 +224,13 @@ fun DialogClientEdit(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(onClick = {
-                        onSave(client.copy(firstName = firstName, lastName = lastName))
+
+                        if (firstName.isEmpty()){
+                            Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
+                        } else{
+                            onSave(client.copy(firstName = firstName, lastName = lastName))
+                        }
+
                     }, colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0XFF1A80E5),
                         contentColor = Color.White

@@ -20,7 +20,8 @@ object DbModule {
             app,
             GastosDB::class.java,
             "gastos_db"
-        ).build()
+        )
+            .build()
     }
 
     @Provides
