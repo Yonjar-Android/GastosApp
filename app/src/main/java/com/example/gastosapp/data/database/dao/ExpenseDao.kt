@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
+import com.example.gastosapp.data.database.entities.MonthlyTotalDb
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -42,4 +43,14 @@ interface ExpenseDao {
 
     @Query("SELECT * FROM expenses WHERE productId = :productId")
     suspend fun getExpensesByProduct(productId: Long): List<ExpenseEntity>
+
+    @Query("""
+    SELECT strftime('%m', datetime(date / 1000, 'unixepoch')) AS month,
+           SUM(payment) AS total
+    FROM expenses
+    WHERE strftime('%Y', datetime(date / 1000, 'unixepoch')) = :year
+    GROUP BY month
+    ORDER BY month
+""")
+    suspend fun getPaymentsByMonth(year: String): List<MonthlyTotalDb>
 }
