@@ -69,7 +69,7 @@ fun ProductScreen(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Products", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Products", fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 
