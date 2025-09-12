@@ -66,7 +66,7 @@ fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()){
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Clients", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Clients", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 

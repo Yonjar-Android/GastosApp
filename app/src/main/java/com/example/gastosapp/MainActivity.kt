@@ -26,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.gastosapp.presentation.products.ProductScreen
 import com.example.gastosapp.presentation.clients.ClientScreen
+import com.example.gastosapp.presentation.dashboard.DashboardScreen
 import com.example.gastosapp.presentation.expenses.MainExpenseScreen
 import com.example.gastosapp.ui.theme.GastosAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -65,7 +66,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("dashboard") {
-
+                            DashboardScreen()
                         }
                     }
                 }

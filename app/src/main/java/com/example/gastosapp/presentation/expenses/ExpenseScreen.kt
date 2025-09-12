@@ -107,7 +107,7 @@ fun ExpenseScreen(viewModel: ExpenseViewModel) {
             .padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Record Expense", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Record Expense", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 

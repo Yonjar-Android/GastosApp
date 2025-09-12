@@ -58,7 +58,7 @@ fun PndExpensesScreen(viewModel: PndExpensesViewModel = hiltViewModel()) {
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(text = "Pending Expenses", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(text = "Pending Expenses", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 
