@@ -1,6 +1,7 @@
 package com.example.gastosapp.data.repositories
 
 import com.example.gastosapp.data.database.entities.ExpenseEntity
+import com.example.gastosapp.data.database.entities.ExpenseWithDetails
 import kotlinx.coroutines.flow.Flow
 
 interface ExpenseRepository {
@@ -8,7 +9,7 @@ interface ExpenseRepository {
     suspend fun update(expense: ExpenseEntity)
     suspend fun delete(expense: ExpenseEntity)
     suspend fun getExpenseById(id: Long): ExpenseEntity?
-    fun getAllExpenses(): Flow<List<ExpenseEntity>>
+    fun getAllExpenses(): Flow<List<ExpenseWithDetails>>
     suspend fun getExpensesByClient(clientId: Long): List<ExpenseEntity>
     suspend fun getExpensesByProduct(productId: Long): List<ExpenseEntity>
 }

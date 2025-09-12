@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.data.database.entities.ExpenseEntity
+import com.example.gastosapp.data.database.entities.ProductEntity
 
 @Composable
 fun MainExpenseScreen(viewModel: ExpenseViewModel = hiltViewModel()) {
@@ -78,8 +79,10 @@ fun MainExpenseScreen(viewModel: ExpenseViewModel = hiltViewModel()) {
 fun ExpenseScreen(viewModel: ExpenseViewModel) {
 
     val clients by viewModel.clients.collectAsStateWithLifecycle()
+    val products by viewModel.products.collectAsStateWithLifecycle()
 
     var openDialog by rememberSaveable { mutableStateOf(false) }
+    var openDialogProduct by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -121,7 +124,11 @@ fun ExpenseScreen(viewModel: ExpenseViewModel) {
         TextFieldEdit(
             value = productName,
             onValueChange = {},
-            title = "Product"
+            title = "Product",
+            readonlyValue = true,
+            onClickListener = {
+                openDialogProduct = true
+            }
         )
 
         TextFieldEdit(
@@ -152,17 +159,25 @@ fun ExpenseScreen(viewModel: ExpenseViewModel) {
 
                 if (response.isNotEmpty()) {
                     Toast.makeText(context, response, Toast.LENGTH_SHORT).show()
-                } else{
+                } else {
                     viewModel.insertExpense(
                         ExpenseEntity(
                             clientId = clientId,
-                            productId = 0L,
+                            productId = productId,
                             description = "",
-                            cost = 0.0,
-                            payment = 0.0,
+                            cost = cost,
+                            payment = payment,
                             date = System.currentTimeMillis()
                         )
                     )
+
+                    clientName = ""
+                    productName = ""
+                    description = ""
+                    costText = ""
+                    paymentText = ""
+                    clientId = 0L
+                    productId = 0L
                 }
             },
             modifier = Modifier
@@ -180,12 +195,24 @@ fun ExpenseScreen(viewModel: ExpenseViewModel) {
     }
 
     if (openDialog) {
-        TableClients(clients,
+        TableClients(
+            clients,
             onDismiss = { openDialog = false },
             onClientSelected = { client ->
                 clientName = "${client.firstName} ${client.lastName}"
                 clientId = client.id
                 openDialog = false
+            })
+    }
+
+    if (openDialogProduct) {
+        TableProducts(
+            products,
+            onDismiss = { openDialogProduct = false },
+            onProductSelected = { product ->
+                productName = product.productName
+                productId = product.id
+                openDialogProduct = false
             })
     }
 }
@@ -199,7 +226,7 @@ fun TextFieldEdit(
     onClickListener: () -> Unit = {},
     onValueChange: (String) -> Unit,
 
-) {
+    ) {
     Box(
         modifier = Modifier
             .clickable {
@@ -243,8 +270,10 @@ fun TextFieldEdit(
 }
 
 @Composable
-fun TableClients(clients: List<ClientEntity>, onDismiss: () -> Unit = {},
-                 onClientSelected: (ClientEntity) -> Unit ) {
+fun TableClients(
+    clients: List<ClientEntity>, onDismiss: () -> Unit = {},
+    onClientSelected: (ClientEntity) -> Unit
+) {
     Dialog(
         onDismissRequest = { onDismiss.invoke() },
         properties = DialogProperties(usePlatformDefaultWidth = false) // 👈 clave
@@ -263,7 +292,8 @@ fun TableClients(clients: List<ClientEntity>, onDismiss: () -> Unit = {},
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     LazyColumn(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier
+                            .padding(16.dp)
                             .weight(1f)
                     ) {
                         items(clients) { client ->
@@ -313,12 +343,86 @@ fun TableClients(clients: List<ClientEntity>, onDismiss: () -> Unit = {},
     }
 }
 
+@Composable
+fun TableProducts(
+    products: List<ProductEntity>, onDismiss: () -> Unit = {},
+    onProductSelected: (ProductEntity) -> Unit
+) {
+    Dialog(
+        onDismissRequest = { onDismiss.invoke() },
+        properties = DialogProperties(usePlatformDefaultWidth = false) // 👈 clave
+    ) {
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .padding(16.dp)
+        ) {
+            if (products.isEmpty()) {
+                Text(text = "No products found", modifier = Modifier.padding(24.dp))
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .weight(1f)
+                    ) {
+                        items(products) { product ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp), // espacio entre filas
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = product.productName,
+                                    fontSize = 16.sp
+                                )
+
+                                Button(
+                                    onClick = {
+                                        onProductSelected.invoke(product)
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0XFF1A80E5),
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Text(text = "Select")
+                                }
+                            }
+                        }
+                    }
+
+                    Button(
+                        onClick = { onDismiss.invoke() },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0XFF1A80E5),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = 0.95f)
+
+                    ) {
+                        Text(text = "Close")
+                    }
+                }
+
+            }
+        }
+    }
+}
+
 fun validations(
     clientName: String,
     product: String,
     cost: Double,
     payment: Double
-): String{
+): String {
     if (clientName.isEmpty()) {
         return "Select a client"
     }
