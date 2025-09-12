@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -274,6 +275,7 @@ fun DialogClientDelete(
                         }
                     },
                     fontSize = 16.sp,
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -285,7 +287,7 @@ fun DialogClientDelete(
                 TextFieldEdit(
                     value = validNumber,
                     onValueChange = { validNumber = it },
-                    title = "Enter the number to confirm"
+                    title = "Enter the number above to confirm"
                 )
 
 
@@ -302,11 +304,11 @@ fun DialogClientDelete(
                     Button(onClick = {
                         onDelete(client)
                     }, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0XFF1A80E5),
+                        containerColor = Color.Red,
                         contentColor = Color.White
                     ),
                         enabled = validNumber == numberGenerator.toString()) {
-                        Text("Save")
+                        Text("Delete")
                     }
                 }
             }

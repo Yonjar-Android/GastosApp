@@ -17,7 +17,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,7 +80,10 @@ fun PndExpensesScreen(viewModel: PndExpensesViewModel = hiltViewModel()) {
     }
 
     if (showDeleteDialog) {
-        DeleteDialog(onDismiss = { showDeleteDialog = false }, onConfirm = {
+        DeleteDialog(onDismiss = {
+            showDeleteDialog = false
+            expenseToModify = null
+        }, onConfirm = {
             showDeleteDialog = false
             if (expenseToModify != null) {
                 viewModel.deleteExpense(expenseToModify!!)
@@ -87,10 +92,14 @@ fun PndExpensesScreen(viewModel: PndExpensesViewModel = hiltViewModel()) {
     }
 
     if (expenseToModify != null && showConfirmDialog) {
-        ConfirmDialog(onDismiss = { expenseToModify = null }, onConfirm = {
+        ConfirmDialog(onDismiss = {
+            showConfirmDialog = false
+            expenseToModify = null
+        }, onConfirm = {
             expenseToModify?.let {
                 viewModel.updateExpense(it)
             }
+            showConfirmDialog = false
             expenseToModify = null
         })
 
@@ -206,40 +215,56 @@ fun DeleteDialog(
     onConfirm: () -> Unit = {}
 ) {
     Dialog(
-        onDismissRequest = { },
-        properties = DialogProperties(usePlatformDefaultWidth = false) // 👈 clave
+        onDismissRequest = { onDismiss.invoke() }
     ) {
-        Column(
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.95f)
+                .fillMaxWidth()
                 .padding(16.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Are you sure you want to delete this expense?",
-                fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp)
-            )
-
-            Row(
-                modifier = Modifier.padding(8.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.95f)
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(onClick = {
-                    onConfirm.invoke()
-                    onDismiss.invoke()
-                }) {
-                    Text(text = "Yes")
+                Text(
+                    text = "Are you sure you want to delete this expense?",
+                    fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = {
+                        onDismiss.invoke()
+                    }) {
+                        Text(text = "No")
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = {
+                            onDismiss.invoke()
+                            onConfirm.invoke()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0XFF1A80E5)
+                        )) {
+                            Text(text = "Yes")
+                        }
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Button(onClick = { onDismiss.invoke() }) {
-                    Text(text = "No")
-                }
             }
-
         }
     }
 }
@@ -250,42 +275,55 @@ fun ConfirmDialog(
     onConfirm: () -> Unit = {}
 ) {
     Dialog(
-        onDismissRequest = { },
-        properties = DialogProperties(usePlatformDefaultWidth = false) // 👈 clave
+        onDismissRequest = { onDismiss.invoke() }
+        // 👈 clave
     ) {
-        Column(
+        Surface(
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
             modifier = Modifier
-                .fillMaxWidth(fraction = 0.95f)
+                .fillMaxWidth()
                 .padding(16.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Are you sure you want to confirm this payment?",
-                fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp)
-            )
-
-            Row(
-                modifier = Modifier.padding(8.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(fraction = 0.95f)
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(onClick = {
-                    onDismiss.invoke()
-                }) {
-                    Text(text = "No")
-                }
+                Text(
+                    text = "Are you sure you want to confirm this payment?",
+                    fontSize = 16.sp, fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp)
+                )
 
-                Spacer(modifier = Modifier.width(8.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = {
+                        onDismiss.invoke()
+                    }) {
+                        Text(text = "No")
+                    }
 
-                Button(onClick = {
-                    onConfirm.invoke()
-                    onDismiss.invoke()
-                }) {
-                    Text(text = "Yes")
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Button(
+                        onClick = {
+                            onConfirm.invoke()
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0XFF1A80E5)
+                        )
+                    ) {
+                        Text(text = "Yes")
+                    }
                 }
             }
-
         }
     }
 }
