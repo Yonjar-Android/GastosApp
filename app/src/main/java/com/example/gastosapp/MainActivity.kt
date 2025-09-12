@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -33,6 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         enableEdgeToEdge()
         setContent {
 
@@ -77,7 +79,7 @@ fun BottomBarNavigation(navController: NavHostController){
     val items = listOf(
         BottomNavItem("Expenses", "expenses", icon = R.drawable.expenseicon),
         BottomNavItem("Clients", "clients", icon = R.drawable.clienticon),
-        BottomNavItem("Products", "products", icon = R.drawable.dashboardicon),
+        BottomNavItem("Products", "products", icon = R.drawable.box),
         BottomNavItem("Dashboard", "dashboard", icon = R.drawable.dashboardicon)
     )
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.SplashScreen."
+        parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenBackground">#fff</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.GastosApp</item>
+        <item name="windowSplashScreenIconBackgroundColor">#FF7B3B</item>
+    </style>
+</resources>

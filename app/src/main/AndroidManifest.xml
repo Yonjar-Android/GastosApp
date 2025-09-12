@@ -11,12 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:name=".GastosApp"
-        android:theme="@style/Theme.GastosApp">
+        android:theme="@style/Base.Theme.SplashScreen.">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.GastosApp">
+            android:theme="@style/Base.Theme.SplashScreen.">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
