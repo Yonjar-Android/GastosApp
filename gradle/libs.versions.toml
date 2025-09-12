@@ -1,6 +1,7 @@
 [versions]
 adaptiveLayout = "1.2.0-beta01"
 agp = "8.12.2"
+androidComposeCharts = "1.2.2"
 coreSplashscreen = "1.2.0-rc01"
 hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
@@ -19,6 +20,7 @@ roomRuntime = "2.7.2"
 kspVersion = "2.0.21-1.0.27"
 
 [libraries]
+android-compose-charts = { module = "com.github.MahmoudIbrahim3:android-compose-charts", version.ref = "androidComposeCharts" }
 androidx-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout", version.ref = "adaptiveLayout" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "adaptiveLayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

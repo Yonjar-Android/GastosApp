@@ -84,4 +84,7 @@ dependencies {
 
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
+
+    //Compose Charts
+    implementation(libs.android.compose.charts)
 }
