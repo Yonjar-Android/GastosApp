@@ -1,6 +1,7 @@
 [versions]
 adaptiveLayout = "1.2.0-beta01"
 agp = "8.12.2"
+coreSplashscreen = "1.2.0-rc01"
 hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.0.21"
@@ -21,6 +22,7 @@ kspVersion = "2.0.21-1.0.27"
 androidx-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout", version.ref = "adaptiveLayout" }
 androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "adaptiveLayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "pagingRuntime" }
