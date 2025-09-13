@@ -7,7 +7,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -23,14 +22,17 @@ import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.gastosapp.presentation.products.ProductScreen
+import androidx.navigation.navArgument
 import com.example.gastosapp.presentation.clients.ClientScreen
+import com.example.gastosapp.presentation.clients.clientDetail.ClientDetailScreen
 import com.example.gastosapp.presentation.dashboard.DashboardScreen
 import com.example.gastosapp.presentation.expenses.MainExpenseScreen
+import com.example.gastosapp.presentation.products.ProductScreen
 import com.example.gastosapp.ui.theme.GastosAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -46,7 +48,8 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
 
             GastosAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize(),
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         BottomBarNavigation(navController = navController)
                     }) { innerPadding ->
@@ -62,7 +65,15 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("clients") {
-                            ClientScreen()
+                            ClientScreen(navHostController = navController)
+                        }
+
+                        composable("clientDetails/{clientId}",
+                            arguments = listOf(navArgument("clientId"){type = NavType.LongType})) {
+                                backStackEntry ->
+                            val clientId = backStackEntry.arguments?.getLong("clientId") ?: 0L
+
+                            ClientDetailScreen(clientId = clientId, navController = navController)
                         }
 
                         composable("products") {
@@ -80,7 +91,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun BottomBarNavigation(navController: NavHostController){
+fun BottomBarNavigation(navController: NavHostController) {
     val items = listOf(
         BottomNavItem("Expenses", "expenses", icon = R.drawable.expenseicon),
         BottomNavItem("Clients", "clients", icon = R.drawable.clienticon),

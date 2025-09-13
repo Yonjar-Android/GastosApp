@@ -2,6 +2,7 @@ package com.example.gastosapp.presentation.clients
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,12 +45,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
 
 @Composable
-fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()) {
+fun ClientScreen(
+    clientViewModel: ClientViewModel = hiltViewModel(),
+    navHostController: NavHostController
+) {
 
     val clients = clientViewModel.clients.collectAsStateWithLifecycle()
 
@@ -65,7 +70,8 @@ fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()) {
             ClientScreenExpanded(
                 clientViewModel,
                 context,
-                clients.value
+                clients.value,
+                navHostController
             )
         }
         // Screen >= 600dp
@@ -75,12 +81,17 @@ fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()) {
             ClientScreenExpanded(
                 clientViewModel,
                 context,
-                clients.value
+                clients.value,
+                navHostController
             )
         }
         // Screen < 600dp
         else -> {
-            ClientScreenCompact(clientViewModel, context, clients.value)
+            ClientScreenCompact(
+                clientViewModel,
+                context,
+                clients.value,
+                navHostController)
         }
     }
 
@@ -106,14 +117,17 @@ fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()) {
 fun ClientScreenExpanded(
     clientViewModel: ClientViewModel,
     context: Context,
-    clients: List<ClientEntity>
+    clients: List<ClientEntity>,
+    navHostController: NavHostController
 ) {
 
     Row(
         modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ClientForm(clientViewModel, context)
@@ -124,7 +138,12 @@ fun ClientScreenExpanded(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            ClientsList(clientViewModel, clients, textModifier = Modifier.align(Alignment.CenterHorizontally))
+            ClientsList(
+                clientViewModel,
+                clients,
+                textModifier = Modifier.align(Alignment.CenterHorizontally),
+                navHostController = navHostController
+            )
         }
     }
 }
@@ -133,7 +152,8 @@ fun ClientScreenExpanded(
 fun ClientScreenCompact(
     clientViewModel: ClientViewModel,
     context: Context,
-    clients: List<ClientEntity>
+    clients: List<ClientEntity>,
+    navHostController: NavHostController
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -143,7 +163,10 @@ fun ClientScreenCompact(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ClientsList(clientViewModel, clients, textModifier = Modifier.align(Alignment.Start))
+        ClientsList(
+            clientViewModel, clients, textModifier = Modifier.align(Alignment.Start),
+            navHostController
+        )
     }
 }
 
@@ -152,50 +175,57 @@ fun ClientForm(
     clientViewModel: ClientViewModel,
     context: Context
 ) {
-        Text(text = "Create Client", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Text(text = "Create Client", fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-        Spacer(modifier = Modifier.height(24.dp))
+    Spacer(modifier = Modifier.height(24.dp))
 
-        TextFieldEdit(
-            value = clientViewModel.firstName,
-            onValueChange = { clientViewModel.onFirstNameChange(it) },
-            title = "First Name"
-        )
+    TextFieldEdit(
+        value = clientViewModel.firstName,
+        onValueChange = { clientViewModel.onFirstNameChange(it) },
+        title = "First Name"
+    )
 
-        TextFieldEdit(
-            value = clientViewModel.lastName,
-            onValueChange = { clientViewModel.onLastNameChange(it) },
-            title = "Last Name"
-        )
+    TextFieldEdit(
+        value = clientViewModel.lastName,
+        onValueChange = { clientViewModel.onLastNameChange(it) },
+        title = "Last Name"
+    )
 
-        Button(
-            onClick = {
-                if (clientViewModel.firstName.isEmpty()) {
-                    Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
-                } else {
-                    clientViewModel.insertClient()
-                    // clean values
-                    clientViewModel.onFirstNameChange("")
-                    clientViewModel.onLastNameChange("")
-                }
-            },
-            modifier = Modifier
-                .height(40.dp)
-                .fillMaxWidth(fraction = 0.9f),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0XFF1A80E5),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
+    Button(
+        onClick = {
+            if (clientViewModel.firstName.isEmpty()) {
+                Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
+            } else {
+                clientViewModel.insertClient()
+                // clean values
+                clientViewModel.onFirstNameChange("")
+                clientViewModel.onLastNameChange("")
+            }
+        },
+        modifier = Modifier
+            .height(40.dp)
+            .fillMaxWidth(fraction = 0.9f),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0XFF1A80E5),
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
 }
 
 @Composable
-fun ClientItem(client: ClientEntity, openDialog: () -> Unit, openDialogDelete: () -> Unit) {
+fun ClientItem(
+    client: ClientEntity, openDialog: () -> Unit, openDialogDelete: () -> Unit,
+    navHostController: NavHostController
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(fraction = 0.95f),
+        modifier = Modifier
+            .fillMaxWidth(fraction = 0.95f)
+            .clickable {
+                navHostController.navigate("clientDetails/${client.id}")
+            },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -228,7 +258,8 @@ fun ClientItem(client: ClientEntity, openDialog: () -> Unit, openDialogDelete: (
 @Composable
 fun ClientsList(
     clientViewModel: ClientViewModel, clients: List<ClientEntity>,
-    textModifier: Modifier
+    textModifier: Modifier,
+    navHostController: NavHostController
 ) {
     Text(
         text = "Clients", fontSize = 24.sp, fontWeight = FontWeight.Bold,
@@ -247,7 +278,7 @@ fun ClientsList(
                 clientViewModel.openDeleteDialog(client)
             }, openDialog = {
                 clientViewModel.openEditDialog(client)
-            })
+            }, navHostController = navHostController)
 
             Spacer(modifier = Modifier.height(8.dp))
         }

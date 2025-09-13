@@ -30,8 +30,8 @@ class ExpenseRepositoryImp @Inject constructor(
         return expenseDao.getAllExpensesWithDetails()
     }
 
-    override suspend fun getExpensesByClient(clientId: Long): List<ExpenseEntity> {
-        return emptyList()
+    override fun getExpensesByClientId(clientId: Long): Flow<List<ExpenseWithDetails>> {
+        return expenseDao.getExpensesByClientId(clientId)
     }
 
     override suspend fun getExpensesByProduct(productId: Long): List<ExpenseEntity> {

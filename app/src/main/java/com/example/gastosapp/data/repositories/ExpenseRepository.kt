@@ -13,7 +13,8 @@ interface ExpenseRepository {
     suspend fun delete(expense: ExpenseEntity)
     suspend fun getExpenseById(id: Long): ExpenseEntity?
     fun getAllExpenses(): Flow<List<ExpenseWithDetails>>
-    suspend fun getExpensesByClient(clientId: Long): List<ExpenseEntity>
+
+    fun getExpensesByClientId(clientId: Long): Flow<List<ExpenseWithDetails>>
     suspend fun getExpensesByProduct(productId: Long): List<ExpenseEntity>
 
     @RequiresApi(Build.VERSION_CODES.O)

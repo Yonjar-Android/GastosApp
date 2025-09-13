@@ -10,5 +10,6 @@ data class ExpenseWithDetails(
     val productId: Long,
     val clientFirstName: String,
     val clientLastName: String,
-    val productName: String
-)
+    val productName: String,
+    val status: Boolean
+    )

@@ -30,7 +30,8 @@ interface ExpenseDao {
            e.clientId, e.productId,
            c.firstName AS clientFirstName, 
            c.lastName AS clientLastName, 
-           p.productName AS productName
+           p.productName AS productName,
+           e.status
     FROM expenses e
     INNER JOIN clients c ON e.clientId = c.id
     INNER JOIN products p ON e.productId = p.id
@@ -54,4 +55,18 @@ interface ExpenseDao {
     ORDER BY month
 """)
     suspend fun getPaymentsByMonth(year: String): List<MonthlyTotalDb>
+
+    @Query("""
+        SELECT e.id, e.description, e.cost, e.payment, e.date, 
+           e.clientId, e.productId, e.status,
+           c.firstName AS clientFirstName, 
+           c.lastName AS clientLastName, 
+           p.productName AS productName
+    FROM expenses e
+    INNER JOIN clients c ON e.clientId = c.id
+    INNER JOIN products p ON e.productId = p.id
+    WHERE clientId = :clientId
+    ORDER BY e.date DESC
+    """)
+    fun getExpensesByClientId(clientId: Long): Flow<List<ExpenseWithDetails>>
 }
