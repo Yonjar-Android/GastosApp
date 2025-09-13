@@ -46,7 +46,8 @@ interface ExpenseDao {
 
     @Query("""
     SELECT strftime('%m', datetime(date / 1000, 'unixepoch')) AS month,
-           SUM(payment) AS total
+           SUM(payment) AS total,
+           SUM(cost) AS totalCost
     FROM expenses
     WHERE strftime('%Y', datetime(date / 1000, 'unixepoch')) = :year
     GROUP BY month

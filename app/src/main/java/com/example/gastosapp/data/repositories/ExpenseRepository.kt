@@ -18,4 +18,7 @@ interface ExpenseRepository {
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getPaymentsByMonth(year: Int = LocalDate.now().year): List<Double>
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    suspend fun getCostsByMonth(year: Int = LocalDate.now().year): List<Double>
 }

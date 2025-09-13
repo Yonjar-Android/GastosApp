@@ -23,9 +23,13 @@ class DashboardViewModel @Inject constructor(
     private val _paymentsByMonth = MutableStateFlow<List<Double>>(emptyList())
     val paymentsByMonth: StateFlow<List<Double>> = _paymentsByMonth.asStateFlow()
 
+    private val _costByMonth = MutableStateFlow<List<Double>>(emptyList())
+    val costByMonth: StateFlow<List<Double>> = _costByMonth.asStateFlow()
+
     init {
         viewModelScope.launch {
             _paymentsByMonth.value = expenseRepository.getPaymentsByMonth()
+            _costByMonth.value = expenseRepository.getCostsByMonth()
         }
     }
 
@@ -33,7 +37,13 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             _paymentsByMonth.value = expenseRepository.getPaymentsByMonth()
         }
-
     }
+
+    fun getCostsByMonth() {
+        viewModelScope.launch {
+            _costByMonth.value = expenseRepository.getCostsByMonth()
+        }
+    }
+
 
 }

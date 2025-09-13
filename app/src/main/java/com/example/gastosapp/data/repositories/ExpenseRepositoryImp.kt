@@ -1,13 +1,10 @@
 package com.example.gastosapp.data.repositories
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.example.gastosapp.data.database.dao.ExpenseDao
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import java.time.LocalDate
 
 
 class ExpenseRepositoryImp @Inject constructor(
@@ -44,6 +41,15 @@ class ExpenseRepositoryImp @Inject constructor(
     override suspend fun getPaymentsByMonth(year: Int): List<Double> {
         val rawResults = expenseDao.getPaymentsByMonth(year.toString())
         val totalsByMonth = rawResults.associate { it.month.toInt() to (it.total ?: 0.0) }
+
+        return (1..12).map { month ->
+            totalsByMonth[month] ?: 0.0
+        }
+    }
+
+    override suspend fun getCostsByMonth(year: Int): List<Double> {
+        val rawResults = expenseDao.getPaymentsByMonth(year.toString())
+        val totalsByMonth = rawResults.associate { it.month.toInt() to (it.totalCost ?: 0.0) }
 
         return (1..12).map { month ->
             totalsByMonth[month] ?: 0.0
