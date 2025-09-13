@@ -1,5 +1,8 @@
 package com.example.gastosapp.presentation.clients
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gastosapp.data.database.entities.ClientEntity
@@ -24,21 +27,32 @@ class ClientViewModel @Inject constructor(
                 initialValue = emptyList()
             )
 
-    fun insertClient(client: ClientEntity) {
+    // Client Functions
+    fun insertClient() {
         viewModelScope.launch {
-            clientRepository.insert(client)
+            clientRepository.insert(
+                ClientEntity(
+                    firstName = firstName,
+                    lastName = lastName
+                )
+            )
         }
     }
 
-    fun updateClient(client: ClientEntity) {
+    fun updateClient() {
         viewModelScope.launch {
-            clientRepository.update(client)
+            clientRepository.update(
+                clientToEdit!!.copy(
+                    firstName = firstNameEdit,
+                    lastName = lastNameEdit
+                )
+            )
         }
     }
 
-    fun deleteClient(client: ClientEntity) {
+    fun deleteClient() {
         viewModelScope.launch {
-            clientRepository.delete(client)
+            clientRepository.delete(clientToEdit!!)
         }
     }
 
@@ -46,6 +60,67 @@ class ClientViewModel @Inject constructor(
         viewModelScope.launch {
             clientRepository.getClientById(id)
         }
+    }
+
+    // Fields
+    var firstName by mutableStateOf("")
+        private set
+
+    var lastName by mutableStateOf("")
+        private set
+
+    fun onFirstNameChange(newValue: String) {
+        firstName = newValue
+    }
+
+    fun onLastNameChange(newValue: String) {
+        lastName = newValue
+    }
+
+    // Dialogs values
+    var showEditDialog by mutableStateOf(false)
+        private set
+
+    var showDeleteDialog by mutableStateOf(false)
+        private set
+
+    var clientToEdit by mutableStateOf<ClientEntity?>(null)
+        private set
+
+    fun openEditDialog(client: ClientEntity) {
+        clientToEdit = client
+        showEditDialog = true
+        firstNameEdit = client.firstName
+        lastNameEdit = client.lastName
+    }
+
+    var firstNameEdit by mutableStateOf("")
+    private set
+
+    var lastNameEdit by mutableStateOf("")
+    private set
+
+    fun onFirstNameEditChange(newValue: String) {
+        firstNameEdit = newValue
+    }
+
+    fun onLastNameEditChange(newValue: String) {
+        lastNameEdit = newValue
+    }
+
+    fun closeEditDialog() {
+        showEditDialog = false
+        clientToEdit = null
+    }
+
+    fun openDeleteDialog(client: ClientEntity) {
+        clientToEdit = client
+        showDeleteDialog = true
+    }
+
+    fun closeDeleteDialog() {
+        showDeleteDialog = false
+        clientToEdit = null
     }
 
 }

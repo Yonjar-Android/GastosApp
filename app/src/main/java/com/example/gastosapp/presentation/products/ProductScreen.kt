@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,9 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.gastosapp.data.database.entities.ClientEntity
+import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ProductEntity
-import com.example.gastosapp.presentation.products.ProductViewModel
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
 
 @Composable
@@ -57,81 +57,137 @@ fun ProductScreen(
 
     val context = LocalContext.current
 
-    // field values
-    var productName by remember { mutableStateOf("") }
+    val windowsSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    var productToModify by remember { mutableStateOf<ProductEntity?>(null) }
+    when {
+        // Screen >= 840dp
+        windowsSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> {
+            ProductScreenExpanded(
+                productViewModel,
+                context,
+                products.value
+            )
+        }
+        // Screen >= 600dp
+        windowsSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
+            ProductScreenExpanded(productViewModel, context, products.value)
+        }
+        // Screen < 600dp
+        else -> {
+            ProductScreenCompact(
+                productViewModel,
+                context,
+                products.value
+            )
+        }
+    }
 
-    var showEditDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    if (productViewModel.showEditDialog && productViewModel.productToEdit != null) {
+        DialogProductEdit(
+            context = context,
+            productViewModel = productViewModel,
+            onDismiss = { productViewModel.closeEditDialog() }
+        )
+    }
+
+    if (productViewModel.showDeleteDialog && productViewModel.productToEdit != null) {
+        DialogProductDelete(
+            onDismiss = { productViewModel.closeDeleteDialog() },
+            productViewModel = productViewModel
+        )
+    }
+}
+
+@Composable
+fun ProductScreenExpanded(
+    productViewModel: ProductViewModel,
+    context: Context,
+    products: List<ProductEntity>
+) {
+
+    Row {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ProductForm(productViewModel, context)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            ProductList(
+                productViewModel,
+                products,
+                textModifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            )
+        }
+    }
+}
+
+@Composable
+fun ProductScreenCompact(
+    productViewModel: ProductViewModel,
+    context: Context,
+    products: List<ProductEntity>
+) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Products", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+        ProductForm(productViewModel, context)
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        TextFieldEdit(
-            value = productName,
-            onValueChange = { productName = it },
-            title = "Product Name"
+        ProductList(
+            productViewModel,
+            products,
+            textModifier = Modifier.align(Alignment.Start)
         )
 
-        Button(
-            onClick = {
-                if (productName.isEmpty()) {
-                    Toast.makeText(context, "Product name is required", Toast.LENGTH_SHORT).show()
-                } else {
-                    productViewModel.insertClient(
-                        ProductEntity(
-                            productName = productName
-                        )
-                    )
-                    // clean values
-                    productName = ""
-                }
-            },
-            modifier = Modifier
-                .height(40.dp)
-                .fillMaxWidth(fraction = 0.9f),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0XFF1A80E5),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(text = "Add product", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
+    }
+}
 
-        Spacer(modifier = Modifier.height(24.dp))
+@Composable
+fun ProductList(
+    productViewModel: ProductViewModel,
+    products: List<ProductEntity>,
+    textModifier: Modifier
+) {
+    Text(
+        text = "Products", fontSize = 24.sp, fontWeight = FontWeight.Bold,
+        modifier = textModifier
+            .padding(start = 24.dp)
+    )
 
-        Text(
-            text = "Product", fontSize = 24.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(start = 24.dp)
-        )
+    Spacer(modifier = Modifier.height(24.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth(fraction = 0.95f)
+            .padding(start = 16.dp),
+    ) {
+        items(products) { product ->
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth(fraction = 0.95f)
-                .padding(start = 16.dp),
-        ) {
-            items(products.value) { product ->
-
-                Row(modifier = Modifier.fillMaxWidth(fraction = 0.95f), verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+            Row(
+                modifier = Modifier.fillMaxWidth(fraction = 0.95f),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(text = product.productName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                 Row {
                     IconButton(
                         onClick = {
-                            productToModify = product
-                            showEditDialog = true
+                            productViewModel.openEditDialog(product)
                         }
                     ) {
                         Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
@@ -139,57 +195,69 @@ fun ProductScreen(
 
                     IconButton(
                         onClick = {
-                            productToModify = product
-                            showDeleteDialog = true
+                            productViewModel.openDeleteDialog(product)
                         }
                     ) {
                         Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                     }
-                }}
-
-                Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
+}
 
-    if (showEditDialog) {
-        DialogProductEdit(
-            context = context,
-            product = productToModify!!,
-            onDismiss = { showEditDialog = false },
-            onSave = { product ->
-                productViewModel.updateClient(product)
-                showEditDialog = false
-            }
-        )
-    }
+@Composable
+fun ProductForm(
+    productViewModel: ProductViewModel,
+    context: Context
+) {
+    Text(text = "Create Product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
-    if (showDeleteDialog) {
-        DialogProductDelete(
-            product = productToModify!!,
-            onDismiss = { showDeleteDialog = false },
-            onDelete = { product ->
-                productViewModel.deleteClient(product)
-                showDeleteDialog = false
+    Spacer(modifier = Modifier.height(24.dp))
+
+    TextFieldEdit(
+        value = productViewModel.productName,
+        onValueChange = { productViewModel.onProductNameChange(it) },
+        title = "Product Name"
+    )
+
+    Button(
+        onClick = {
+            if (productViewModel.productName.isEmpty()) {
+                Toast.makeText(context, "Product name is required", Toast.LENGTH_SHORT).show()
+            } else {
+                productViewModel.insertProduct()
+                // clean values
+                productViewModel.onProductNameChange("")
             }
-        )
+        },
+        modifier = Modifier
+            .height(40.dp)
+            .fillMaxWidth(fraction = 0.9f),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0XFF1A80E5),
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
 fun DialogProductEdit(
     context: Context,
-    product: ProductEntity,
-    onDismiss: () -> Unit,
-    onSave: (ProductEntity) -> Unit
+    productViewModel: ProductViewModel,
+    onDismiss: () -> Unit
 ) {
-    var productName by remember { mutableStateOf(product.productName) }
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -199,7 +267,11 @@ fun DialogProductEdit(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextFieldEdit(value = productName, onValueChange = { productName = it }, title = "Product's Name")
+                TextFieldEdit(
+                    value = productViewModel.productNameEdit,
+                    onValueChange = { productViewModel.onProductNameEditChange(it) },
+                    title = "Product's Name"
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -211,18 +283,25 @@ fun DialogProductEdit(
                         Text("Cancel")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = {
+                    Button(
+                        onClick = {
 
-                        if (productName.isEmpty()){
-                            Toast.makeText(context, "Product name is required", Toast.LENGTH_SHORT).show()
-                        } else{
-                            onSave(product.copy(productName = productName))
-                        }
+                            if (productViewModel.productNameEdit.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    "Product name is required",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                productViewModel.updateProduct()
+                                productViewModel.closeEditDialog()
+                            }
 
-                    }, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0XFF1A80E5),
-                        contentColor = Color.White
-                    )) {
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0XFF1A80E5),
+                            contentColor = Color.White
+                        )
+                    ) {
                         Text("Save")
                     }
                 }
@@ -233,9 +312,8 @@ fun DialogProductEdit(
 
 @Composable
 fun DialogProductDelete(
-    product: ProductEntity,
-    onDismiss: () -> Unit,
-    onDelete: (ProductEntity) -> Unit
+    productViewModel: ProductViewModel,
+    onDismiss: () -> Unit
 ) {
     val numberGenerator = (100000..999999).random()
 
@@ -245,7 +323,9 @@ fun DialogProductDelete(
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -259,7 +339,7 @@ fun DialogProductDelete(
                     buildAnnotatedString {
                         append("Would you like to delete the product: ")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("${product.productName}?")
+                            append("${productViewModel.productToEdit?.productName}?")
                         }
                     },
                     fontSize = 16.sp,
@@ -289,13 +369,16 @@ fun DialogProductDelete(
                         Text("Cancel")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = {
-                        onDelete(product)
-                    }, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red,
-                        contentColor = Color.White
-                    ),
-                        enabled = validNumber == numberGenerator.toString()) {
+                    Button(
+                        onClick = {
+                            productViewModel.deleteProduct()
+                            productViewModel.closeDeleteDialog()
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Red,
+                            contentColor = Color.White
+                        ),
+                        enabled = validNumber == numberGenerator.toString()
+                    ) {
                         Text("Delete")
                     }
                 }

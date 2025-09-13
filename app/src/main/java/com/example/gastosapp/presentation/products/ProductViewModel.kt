@@ -1,5 +1,8 @@
 package com.example.gastosapp.presentation.products
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gastosapp.data.database.entities.ProductEntity
@@ -23,22 +26,77 @@ class ProductViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    fun insertClient(product: ProductEntity){
+    fun insertProduct(){
         viewModelScope.launch {
-            productRepository.insertProduct(product)
+            productRepository.insertProduct(
+                ProductEntity(
+                    productName = productName
+                )
+            )
         }
     }
 
-    fun updateClient(product: ProductEntity){
+    fun updateProduct(){
         viewModelScope.launch {
-            productRepository.updateProduct(product)
+            productRepository.updateProduct(
+                productToEdit!!.copy(
+                    productName = productNameEdit
+                )
+            )
         }
     }
 
-    fun deleteClient(product: ProductEntity){
+    fun deleteProduct(){
         viewModelScope.launch {
-            productRepository.deleteProduct(product)
+            productRepository.deleteProduct(productToEdit!!)
         }
     }
 
+    // Fields
+
+    var productName by mutableStateOf("")
+        private set
+
+    fun onProductNameChange(value: String){
+        productName = value
+    }
+
+    var productToEdit by mutableStateOf<ProductEntity?>(null)
+    private set
+
+    // Dialog values
+
+    var showEditDialog by mutableStateOf(false)
+    private set
+
+    var productNameEdit by mutableStateOf("")
+    private set
+
+    fun onProductNameEditChange(value: String){
+        productNameEdit = value
+    }
+
+    fun openEditDialog(product: ProductEntity){
+        productNameEdit = product.productName
+        showEditDialog = true
+        productToEdit = product
+    }
+
+    fun closeEditDialog(){
+        showEditDialog = false
+        productToEdit = null
+    }
+
+    var showDeleteDialog by mutableStateOf(false)
+        private set
+
+    fun openDeleteDialog(product: ProductEntity){
+        showDeleteDialog = true
+        productToEdit = product
+    }
+
+    fun closeDeleteDialog(){
+        showDeleteDialog = false
+        productToEdit = null
+    }
 }

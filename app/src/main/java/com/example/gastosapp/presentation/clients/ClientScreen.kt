@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,62 +44,143 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
 
 @Composable
-fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()){
+fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()) {
 
     val clients = clientViewModel.clients.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
-    // field values
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
+    val windowsSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    var clientToModify by remember { mutableStateOf<ClientEntity?>(null) }
+    when {
+        // Screen >= 840dp
+        windowsSizeClass.isWidthAtLeastBreakpoint(
+            WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
+        ) -> {
+            ClientScreenExpanded(
+                clientViewModel,
+                context,
+                clients.value
+            )
+        }
+        // Screen >= 600dp
+        windowsSizeClass.isWidthAtLeastBreakpoint(
+            WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
+        ) -> {
+            ClientScreenExpanded(
+                clientViewModel,
+                context,
+                clients.value
+            )
+        }
+        // Screen < 600dp
+        else -> {
+            ClientScreenCompact(clientViewModel, context, clients.value)
+        }
+    }
 
-    var showEditDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    if (clientViewModel.showEditDialog && clientViewModel.clientToEdit != null) {
+        DialogClientEdit(
+            viewModel = clientViewModel,
+            context = context,
+            onDismiss = { clientViewModel.closeEditDialog() },
 
+            )
+    }
+
+    if (clientViewModel.showDeleteDialog && clientViewModel.clientToEdit != null) {
+        DialogClientDelete(
+            viewModel = clientViewModel,
+            onDismiss = { clientViewModel.closeDeleteDialog() },
+        )
+    }
+
+}
+
+@Composable
+fun ClientScreenExpanded(
+    clientViewModel: ClientViewModel,
+    context: Context,
+    clients: List<ClientEntity>
+) {
+
+    Row(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ClientForm(clientViewModel, context)
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            ClientsList(clientViewModel, clients, textModifier = Modifier.align(Alignment.CenterHorizontally))
+        }
+    }
+}
+
+@Composable
+fun ClientScreenCompact(
+    clientViewModel: ClientViewModel,
+    context: Context,
+    clients: List<ClientEntity>
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Clients", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+        ClientForm(clientViewModel, context)
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        ClientsList(clientViewModel, clients, textModifier = Modifier.align(Alignment.Start))
+    }
+}
+
+@Composable
+fun ClientForm(
+    clientViewModel: ClientViewModel,
+    context: Context
+) {
+        Text(text = "Create Client", fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 
         TextFieldEdit(
-            value = firstName,
-            onValueChange = { firstName = it },
+            value = clientViewModel.firstName,
+            onValueChange = { clientViewModel.onFirstNameChange(it) },
             title = "First Name"
         )
 
         TextFieldEdit(
-            value = lastName,
-            onValueChange = { lastName = it },
+            value = clientViewModel.lastName,
+            onValueChange = { clientViewModel.onLastNameChange(it) },
             title = "Last Name"
         )
 
         Button(
             onClick = {
-                if (firstName.isEmpty()){
+                if (clientViewModel.firstName.isEmpty()) {
                     Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
-                } else{
-                    clientViewModel.insertClient(
-                        ClientEntity(
-                            firstName = firstName,
-                            lastName = lastName
-                        )
-                    )
+                } else {
+                    clientViewModel.insertClient()
                     // clean values
-                    firstName = ""
-                    lastName = ""
+                    clientViewModel.onFirstNameChange("")
+                    clientViewModel.onLastNameChange("")
                 }
             },
-            modifier = Modifier.height(40.dp)
+            modifier = Modifier
+                .height(40.dp)
                 .fillMaxWidth(fraction = 0.9f),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0XFF1A80E5),
@@ -106,64 +188,22 @@ fun ClientScreen(clientViewModel: ClientViewModel = hiltViewModel()){
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = "Add client", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(text = "Clients", fontSize = 24.sp, fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Start).padding(start = 24.dp))
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(fraction = 0.95f)
-                .padding(start = 16.dp),
-        ) {
-            items(clients.value){ client ->
-                ClientItem(client, openDialogDelete = {
-                    clientToModify = client
-                    showDeleteDialog = true
-                }, openDialog = {
-                    clientToModify = client
-                    showEditDialog = true
-                })
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-
-        if (showEditDialog) {
-            DialogClientEdit(
-                context = context,
-                client = clientToModify!!,
-                onDismiss = { showEditDialog = false },
-                onSave = { client ->
-                    clientViewModel.updateClient(client)
-                    showEditDialog = false
-                }
-            )
-        }
-
-        if (showDeleteDialog) {
-            DialogClientDelete(
-                client = clientToModify!!,
-                onDismiss = { showDeleteDialog = false },
-                onDelete = { client ->
-                    clientViewModel.deleteClient(client)
-                    showDeleteDialog = false
-                }
-            )
-        }
-
-    }
 }
 
 @Composable
 fun ClientItem(client: ClientEntity, openDialog: () -> Unit, openDialogDelete: () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth(fraction = 0.95f), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween) {
-        Text(text = "${client.firstName} ${client.lastName}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    Row(
+        modifier = Modifier.fillMaxWidth(fraction = 0.95f),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "${client.firstName} ${client.lastName}",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
 
         Row {
             IconButton(
@@ -186,20 +226,47 @@ fun ClientItem(client: ClientEntity, openDialog: () -> Unit, openDialogDelete: (
 }
 
 @Composable
-fun DialogClientEdit(
-    context: Context,
-    client: ClientEntity,
-    onDismiss: () -> Unit,
-    onSave: (ClientEntity) -> Unit
+fun ClientsList(
+    clientViewModel: ClientViewModel, clients: List<ClientEntity>,
+    textModifier: Modifier
 ) {
-    var firstName by remember { mutableStateOf(client.firstName) }
-    var lastName by remember { mutableStateOf(client.lastName) }
+    Text(
+        text = "Clients", fontSize = 24.sp, fontWeight = FontWeight.Bold,
+        modifier = textModifier.padding(start = 24.dp)
+    )
 
+    Spacer(modifier = Modifier.height(24.dp))
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth(fraction = 0.95f)
+            .padding(start = 16.dp),
+    ) {
+        items(clients) { client ->
+            ClientItem(client, openDialogDelete = {
+                clientViewModel.openDeleteDialog(client)
+            }, openDialog = {
+                clientViewModel.openEditDialog(client)
+            })
+
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+@Composable
+fun DialogClientEdit(
+    viewModel: ClientViewModel,
+    context: Context,
+    onDismiss: () -> Unit
+) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -209,8 +276,16 @@ fun DialogClientEdit(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextFieldEdit(value = firstName, onValueChange = { firstName = it }, title = "First Name")
-                TextFieldEdit(value = lastName, onValueChange = { lastName = it }, title = "Last Name")
+                TextFieldEdit(
+                    value = viewModel.firstNameEdit,
+                    onValueChange = { viewModel.onFirstNameEditChange(it) },
+                    title = "First Name"
+                )
+                TextFieldEdit(
+                    value = viewModel.lastNameEdit,
+                    onValueChange = { viewModel.onLastNameEditChange(it) },
+                    title = "Last Name"
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -222,18 +297,25 @@ fun DialogClientEdit(
                         Text("Cancel")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = {
+                    Button(
+                        onClick = {
 
-                        if (firstName.isEmpty()){
-                            Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
-                        } else{
-                            onSave(client.copy(firstName = firstName, lastName = lastName))
-                        }
+                            if (viewModel.firstNameEdit.isEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    "First name is required",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                viewModel.updateClient()
+                                viewModel.closeEditDialog()
+                            }
 
-                    }, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0XFF1A80E5),
-                        contentColor = Color.White
-                    )) {
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0XFF1A80E5),
+                            contentColor = Color.White
+                        )
+                    ) {
                         Text("Save")
                     }
                 }
@@ -244,11 +326,9 @@ fun DialogClientEdit(
 
 @Composable
 fun DialogClientDelete(
-    client: ClientEntity,
+    viewModel: ClientViewModel,
     onDismiss: () -> Unit,
-    onDelete: (ClientEntity) -> Unit
 ) {
-
     val numberGenerator = (100000..999999).random()
 
     var validNumber by remember { mutableStateOf("") }
@@ -257,7 +337,9 @@ fun DialogClientDelete(
         Surface(
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -271,7 +353,7 @@ fun DialogClientDelete(
                     buildAnnotatedString {
                         append("Would you like to delete the user: ")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("${client.firstName} ${client.lastName}?")
+                            append("${viewModel.clientToEdit?.firstName} ${viewModel.clientToEdit?.lastName}?")
                         }
                     },
                     fontSize = 16.sp,
@@ -290,7 +372,6 @@ fun DialogClientDelete(
                     title = "Enter the number above to confirm"
                 )
 
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
@@ -301,13 +382,18 @@ fun DialogClientDelete(
                         Text("Cancel")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    Button(onClick = {
-                        onDelete(client)
-                    }, colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red,
-                        contentColor = Color.White
-                    ),
-                        enabled = validNumber == numberGenerator.toString()) {
+                    Button(
+                        onClick = {
+                            if (viewModel.clientToEdit != null) {
+                                viewModel.deleteClient()
+                                viewModel.closeDeleteDialog()
+                            }
+                        }, colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Red,
+                            contentColor = Color.White
+                        ),
+                        enabled = validNumber == numberGenerator.toString()
+                    ) {
                         Text("Delete")
                     }
                 }

@@ -98,7 +98,7 @@ fun DashboardScreen(
                         .border(1.dp, Color(0XFFDBE0E5), shape = RoundedCornerShape(12.dp))
                         .padding(10.dp),
                 ) {
-                    Text("Total Owed", fontSize = 16.sp, fontWeight = FontWeight.Normal,
+                    Text("Total Owed", fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center)
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -115,7 +115,7 @@ fun DashboardScreen(
                         .padding(10.dp),
 
                     ) {
-                    Text("Total Received", fontSize = 16.sp, fontWeight = FontWeight.Normal,
+                    Text("Total Received", fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center)
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -139,7 +139,7 @@ fun DashboardScreen(
                         .padding(10.dp),
 
                     ) {
-                    Text("Net Profit", fontSize = 16.sp, fontWeight = FontWeight.Normal,
+                    Text("Net Profit", fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center)
 
                     Spacer(modifier = Modifier.height(8.dp))
