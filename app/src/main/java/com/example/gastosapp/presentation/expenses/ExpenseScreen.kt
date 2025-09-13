@@ -1,5 +1,6 @@
 package com.example.gastosapp.presentation.expenses
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
@@ -24,13 +27,11 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,8 +45,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ClientEntity
-import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ProductEntity
 
 @Composable
@@ -56,6 +57,7 @@ fun MainExpenseScreen(viewModel: ExpenseViewModel = hiltViewModel()) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(
+            modifier = Modifier,
             selectedTabIndex = selectedTabIndex.intValue,
         ) {
             tabs.forEachIndexed { index, title ->
@@ -81,144 +83,149 @@ fun ExpenseScreen(viewModel: ExpenseViewModel) {
     val clients by viewModel.clients.collectAsStateWithLifecycle()
     val products by viewModel.products.collectAsStateWithLifecycle()
 
-    var openDialog by rememberSaveable { mutableStateOf(false) }
-    var openDialogProduct by rememberSaveable { mutableStateOf(false) }
-
     val context = LocalContext.current
 
-    // Field Values
-
-    var clientName by rememberSaveable { mutableStateOf("") }
-    var clientId by rememberSaveable { mutableLongStateOf(0L) }
-
-    var productName by rememberSaveable { mutableStateOf("") }
-    var productId by rememberSaveable { mutableLongStateOf(0L) }
-
-    var description by rememberSaveable { mutableStateOf("") }
-    var costText by rememberSaveable { mutableStateOf("") }
-    var paymentText by rememberSaveable { mutableStateOf("") }
-
-    val cost = costText.toDoubleOrNull() ?: 0.0
-    val payment = paymentText.toDoubleOrNull() ?: 0.0
+    val windowsSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Record Expense", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        when {
+            // Screen >= 840dp
+            windowsSizeClass.isWidthAtLeastBreakpoint(
+                WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
+            ) -> {
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        TextFieldEdit(
-            value = clientName,
-            onValueChange = {},
-            title = "Select Client",
-            readonlyValue = true,
-            onClickListener = {
-                openDialog = true
+                FormExpense(viewModel, context,
+                    modifier = Modifier.weight(1f))
             }
-        )
-
-        TextFieldEdit(
-            value = productName,
-            onValueChange = {},
-            title = "Product",
-            readonlyValue = true,
-            onClickListener = {
-                openDialogProduct = true
+            // Screen >= 600dp
+            windowsSizeClass.isWidthAtLeastBreakpoint(
+                WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
+            ) -> {
+                FormExpense(viewModel, context,
+                    modifier = Modifier.weight(1f))
             }
-        )
 
-        TextFieldEdit(
-            value = description,
-            onValueChange = { description = it },
-            title = "Description (Optional)"
-        )
-
-        TextFieldEdit(
-            value = costText,
-            onValueChange = { costText = it },
-            title = "Cost",
-            keyBoardType = KeyboardType.Number
-        )
-
-        TextFieldEdit(
-            value = paymentText,
-            onValueChange = { paymentText = it },
-            title = "Amount to Collect",
-            keyBoardType = KeyboardType.Number
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = {
-                val response = validations(clientName, productName, cost, payment)
-
-                if (response.isNotEmpty()) {
-                    Toast.makeText(context, response, Toast.LENGTH_SHORT).show()
-                } else {
-                    viewModel.insertExpense(
-                        ExpenseEntity(
-                            clientId = clientId,
-                            productId = productId,
-                            description = "",
-                            cost = cost,
-                            payment = payment,
-                            date = System.currentTimeMillis()
-                        )
-                    )
-
-                    clientName = ""
-                    productName = ""
-                    description = ""
-                    costText = ""
-                    paymentText = ""
-                    clientId = 0L
-                    productId = 0L
-                }
-            },
-            modifier = Modifier
-                .padding(bottom = 16.dp)
-                .height(40.dp)
-                .fillMaxWidth(fraction = 0.9f),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0XFF1A80E5),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            // Screen < 600dp
+            else -> {
+                    FormExpense(viewModel, context, modifier = Modifier.weight(1f))
+            }
         }
     }
 
-    if (openDialog) {
+    if (viewModel.openDialogClient) {
         TableClients(
             clients,
-            onDismiss = { openDialog = false },
+            onDismiss = { viewModel.openDialogClient(false) },
             onClientSelected = { client ->
-                clientName = "${client.firstName} ${client.lastName}"
-                clientId = client.id
-                openDialog = false
+                viewModel.onClientSelected(client)
+                viewModel.openDialogClient(false)
             })
     }
 
-    if (openDialogProduct) {
+    if (viewModel.openDialogProduct) {
         TableProducts(
             products,
-            onDismiss = { openDialogProduct = false },
+            onDismiss = { viewModel.onOpenDialogProductChange(false) },
             onProductSelected = { product ->
-                productName = product.productName
-                productId = product.id
-                openDialogProduct = false
+                viewModel.onProductSelected(product)
+                viewModel.onOpenDialogProductChange(false)
             })
     }
 }
 
 @Composable
+fun FormExpense(
+    viewModel: ExpenseViewModel,
+    context: Context,
+    modifier: Modifier = Modifier
+) {
+
+    Text(text = "Record Expense", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    TextFieldEdit(
+        value = viewModel.clientName,
+        onValueChange = {},
+        title = "Select Client",
+        readonlyValue = true,
+        onClickListener = {
+            viewModel.openDialogClient(true)
+        }
+    )
+
+    TextFieldEdit(
+        value = viewModel.productName,
+        onValueChange = {},
+        title = "Product",
+        readonlyValue = true,
+        onClickListener = {
+            viewModel.onOpenDialogProductChange(true)
+        }
+    )
+
+    TextFieldEdit(
+        value = viewModel.description,
+        onValueChange = { viewModel.onDescriptionChanged(it) },
+        title = "Description (Optional)"
+    )
+
+    TextFieldEdit(
+        value = viewModel.costText,
+        onValueChange = { viewModel.onCostChanged(it) },
+        title = "Cost",
+        keyBoardType = KeyboardType.Number
+    )
+
+    TextFieldEdit(
+        value = viewModel.paymentText,
+        onValueChange = { viewModel.onPaymentChanged(it) },
+        title = "Amount to Collect",
+        keyBoardType = KeyboardType.Number
+    )
+
+    Spacer(modifier = modifier)
+
+    Button(
+        onClick = {
+            val response = validations(
+                viewModel.clientName,
+                viewModel.productName,
+                viewModel.costText,
+                viewModel.paymentText
+            )
+
+            if (response.isNotEmpty()) {
+                Toast.makeText(context, response, Toast.LENGTH_SHORT).show()
+            } else {
+                // create expense and clean values
+                viewModel.insertExpense()
+
+            }
+        },
+        modifier = Modifier
+            .padding(bottom = 16.dp)
+            .height(40.dp)
+            .fillMaxWidth(fraction = 0.9f),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0XFF1A80E5),
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
 fun TextFieldEdit(
+    modifier: Modifier = Modifier,
     value: String,
     title: String,
     readonlyValue: Boolean = false,
@@ -237,7 +244,7 @@ fun TextFieldEdit(
             value = value,
             onValueChange = onValueChange,
             label = { Text(text = title) },
-            modifier = Modifier
+            modifier = modifier
                 .height(56.dp)
                 .fillMaxWidth(fraction = 0.9f)
                 .border(
@@ -420,8 +427,8 @@ fun TableProducts(
 fun validations(
     clientName: String,
     product: String,
-    cost: Double,
-    payment: Double
+        cost: String,
+    payment: String
 ): String {
     if (clientName.isEmpty()) {
         return "Select a client"
@@ -429,11 +436,18 @@ fun validations(
     if (product.isEmpty()) {
         return "Select a product"
     }
-    if (cost == 0.0) {
-        return "Enter a cost"
+
+    val costValue = cost.toDoubleOrNull()
+    if (costValue == null) return "Cost must be a number"
+
+    val paymentValue = payment.toDoubleOrNull()
+    if (paymentValue == null) return "Payment must be a number"
+
+    if (costValue <= 0.0) {
+        return "Enter valid a cost"
     }
-    if (payment == 0.0) {
-        return "Enter a payment"
+    if (paymentValue <= 0.0) {
+        return "Enter a valid payment"
     }
     return ""
 }
