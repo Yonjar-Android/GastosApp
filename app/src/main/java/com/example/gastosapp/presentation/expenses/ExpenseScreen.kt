@@ -45,12 +45,16 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.data.database.entities.ProductEntity
 
 @Composable
-fun MainExpenseScreen(viewModel: ExpenseViewModel = hiltViewModel()) {
+fun MainExpenseScreen(
+    viewModel: ExpenseViewModel = hiltViewModel(),
+    navController: NavHostController
+) {
     val tabs = listOf("Add Expense", "Pending Expenses")
 
     val selectedTabIndex = rememberSaveable { mutableIntStateOf(0) }
@@ -71,7 +75,7 @@ fun MainExpenseScreen(viewModel: ExpenseViewModel = hiltViewModel()) {
 
         when (selectedTabIndex.intValue) {
             0 -> ExpenseScreen(viewModel)
-            1 -> PndExpensesScreen()
+            1 -> PndExpensesScreen(navController = navController)
         }
     }
 

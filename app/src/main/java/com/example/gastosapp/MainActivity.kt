@@ -32,6 +32,7 @@ import com.example.gastosapp.presentation.clients.ClientScreen
 import com.example.gastosapp.presentation.clients.clientDetail.ClientDetailScreen
 import com.example.gastosapp.presentation.dashboard.DashboardScreen
 import com.example.gastosapp.presentation.expenses.MainExpenseScreen
+import com.example.gastosapp.presentation.expenses.expenseDetail.ExpenseDetailScreen
 import com.example.gastosapp.presentation.products.ProductScreen
 import com.example.gastosapp.ui.theme.GastosAppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,7 +62,14 @@ class MainActivity : ComponentActivity() {
                         startDestination = "expenses"
                     ) {
                         composable("expenses") {
-                            MainExpenseScreen()
+                            MainExpenseScreen(navController = navController)
+                        }
+
+                        composable("expenseDetails/{expenseId}",
+                            arguments = listOf(navArgument("expenseId"){type = NavType.LongType})) {
+                                backStackEntry ->
+                            val expenseId = backStackEntry.arguments?.getLong("expenseId") ?: 0L
+                            ExpenseDetailScreen(expenseId = expenseId, navController = navController)
                         }
 
                         composable("clients") {

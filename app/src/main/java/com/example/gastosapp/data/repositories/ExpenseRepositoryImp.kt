@@ -22,7 +22,7 @@ class ExpenseRepositoryImp @Inject constructor(
         expenseDao.delete(expense)
     }
 
-    override suspend fun getExpenseById(id: Long): ExpenseEntity? {
+    override suspend fun getExpenseById(id: Long): ExpenseWithDetails? {
         return expenseDao.getExpenseById(id)
     }
 

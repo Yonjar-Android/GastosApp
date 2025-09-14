@@ -35,14 +35,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
 
 @Composable
-fun PndExpensesScreen(viewModel: PndExpensesViewModel = hiltViewModel()) {
+fun PndExpensesScreen(
+    viewModel: PndExpensesViewModel = hiltViewModel(),
+    navController: NavHostController
+) {
 
     val expenses by viewModel.expenses.collectAsStateWithLifecycle()
 
@@ -66,6 +69,7 @@ fun PndExpensesScreen(viewModel: PndExpensesViewModel = hiltViewModel()) {
             items(expenses) { expense ->
                 ExpenseItem(
                     expense,
+                    navController = navController,
                     onConfirm = {
                         expenseToModify = it
                         showConfirmDialog = true
@@ -109,6 +113,7 @@ fun PndExpensesScreen(viewModel: PndExpensesViewModel = hiltViewModel()) {
 @Composable
 fun ExpenseItem(
     expense: ExpenseWithDetails,
+    navController: NavHostController,
     onConfirm: (ExpenseEntity) -> Unit = {},
     onDelete: (ExpenseEntity) -> Unit = {}
 ) {
@@ -118,9 +123,9 @@ fun ExpenseItem(
     Row(
         modifier = Modifier
             .fillMaxWidth(fraction = 0.95f)
-
             .combinedClickable(
                 onClick = { showActions = !showActions },
+                onLongClick = { navController.navigate("expenseDetails/${expense.id}") }
             )
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically

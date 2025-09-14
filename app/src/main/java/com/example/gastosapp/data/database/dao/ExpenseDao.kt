@@ -22,8 +22,19 @@ interface ExpenseDao {
     @Delete
     suspend fun delete(expense: ExpenseEntity)
 
-    @Query("SELECT * FROM expenses WHERE id = :id")
-    suspend fun getExpenseById(id: Long): ExpenseEntity?
+    @Query("""
+        SELECT e.id, e.description, e.cost, e.payment, e.date, 
+           e.clientId, e.productId, e.status,
+           c.firstName AS clientFirstName, 
+           c.lastName AS clientLastName, 
+           p.productName AS productName
+    FROM expenses e
+    INNER JOIN clients c ON e.clientId = c.id
+    INNER JOIN products p ON e.productId = p.id
+    WHERE e.id = :id
+    ORDER BY e.date DESC
+    """)
+    suspend fun getExpenseById(id: Long): ExpenseWithDetails?
 
     @Query("""
     SELECT e.id, e.description, e.cost, e.payment, e.date, 
