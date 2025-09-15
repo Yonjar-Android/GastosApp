@@ -47,6 +47,10 @@ class ExpenseRepositoryImp @Inject constructor(
         }
     }
 
+    override suspend fun getAvailableYears(): List<String> {
+        return expenseDao.getAvailableYears()
+    }
+
     override suspend fun getCostsByMonth(year: Int): List<Double> {
         val rawResults = expenseDao.getPaymentsByMonth(year.toString())
         val totalsByMonth = rawResults.associate { it.month.toInt() to (it.totalCost ?: 0.0) }

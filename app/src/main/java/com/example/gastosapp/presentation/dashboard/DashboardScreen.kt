@@ -4,6 +4,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,11 +16,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +51,8 @@ fun DashboardScreen(
 
     LaunchedEffect(Unit) {
         viewModel.getPaymentsByMonth()
+        viewModel.getCostsByMonth()
+        viewModel.getAvailableYears()
     }
 
     val paymentsByMonth by viewModel.paymentsByMonth.collectAsStateWithLifecycle()
@@ -54,17 +65,23 @@ fun DashboardScreen(
         windowsSizeClass.isWidthAtLeastBreakpoint(
             WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
         ) -> {
-            DashboardScreenExpanded(paymentsByMonth, costsByMonth)
+            DashboardScreenExpanded(
+                paymentsByMonth, costsByMonth,
+                viewModel
+            )
         }
         // Screen >= 600dp
         windowsSizeClass.isWidthAtLeastBreakpoint(
             WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
         ) -> {
-            DashboardScreenExpanded(paymentsByMonth, costsByMonth)
+            DashboardScreenExpanded(
+                paymentsByMonth, costsByMonth,
+                viewModel
+            )
         }
         // Screen < 600dp
         else -> {
-            DashboardScreenCompact(paymentsByMonth, costsByMonth)
+            DashboardScreenCompact(paymentsByMonth, costsByMonth, viewModel)
         }
     }
 }
@@ -73,28 +90,44 @@ fun DashboardScreen(
 @Composable
 fun DashboardScreenExpanded(
     paymentsByMonth: List<Double>,
-    costByMonth: List<Double>
+    costByMonth: List<Double>,
+    viewModel: DashboardViewModel
 ) {
+
+    var year by rememberSaveable { mutableIntStateOf(LocalDate.now().year) }
+
     Row(
         modifier = Modifier.fillMaxSize(fraction = 0.95f),
         horizontalArrangement = Arrangement.Center
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().weight(1f)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            DashboardToShow(paymentsByMonth,
-                modifier = Modifier.fillMaxWidth(fraction = 0.9f))
+            DashboardToShow(
+                paymentsByMonth,
+                modifier = Modifier.fillMaxWidth(fraction = 0.9f),
+                viewModel = viewModel,
+                onChangeYear = { yearSelected ->
+                    viewModel.getPaymentsByMonth(yearSelected)
+                    viewModel.getCostsByMonth(yearSelected)
+                    year = yearSelected
+                }
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Column(
-            modifier = Modifier.fillMaxWidth().weight(1f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            SummaryInfo(paymentsByMonth, costByMonth)
+            SummaryInfo(paymentsByMonth, costByMonth, year = year)
         }
     }
 }
@@ -103,24 +136,57 @@ fun DashboardScreenExpanded(
 @Composable
 fun DashboardScreenCompact(
     paymentsByMonth: List<Double>,
-    costsByMonth: List<Double>
+    costsByMonth: List<Double>,
+    viewModel: DashboardViewModel
 ) {
+
+    var year by rememberSaveable { mutableIntStateOf(LocalDate.now().year) }
+
     Column(
-        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        DashboardToShow(paymentsByMonth)
+        DashboardToShow(paymentsByMonth, viewModel = viewModel, onChangeYear = { yearSelected ->
+            viewModel.getPaymentsByMonth(yearSelected)
+            viewModel.getCostsByMonth(yearSelected)
+            year = yearSelected
+        })
         Spacer(modifier = Modifier.height(24.dp))
-        SummaryInfo(paymentsByMonth, costsByMonth)
+        SummaryInfo(
+            paymentsByMonth, costsByMonth,
+            year = year
+        )
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DashboardToShow(
     paymentsByMonth: List<Double>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: DashboardViewModel,
+    onChangeYear: (Int) -> Unit = {}
 ) {
+
+    var expanded by remember { mutableStateOf(false) }
+    val years by viewModel.availableYears.collectAsStateWithLifecycle()
+
     Text(text = "Dashboard", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    DropMenuInterface(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        years = years,
+        onUpdateData = { year ->
+            expanded = false
+            onChangeYear.invoke(year) // Function to change the value of year shows in Summary and called viewModel functions
+        }
+    )
+
 
     Spacer(modifier = Modifier.height(16.dp))
 
@@ -155,11 +221,10 @@ fun DashboardToShow(
 @Composable
 fun SummaryInfo(
     paymentsByMonth: List<Double>,
-    costByMonth: List<Double>
-
-)
-{
-    Text("Summary ${LocalDate.now().year}", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    costByMonth: List<Double>,
+    year: Int = LocalDate.now().year
+) {
+    Text("Summary $year", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
     Spacer(modifier = Modifier.height(16.dp))
 
@@ -246,5 +311,36 @@ fun SummaryInfo(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DropMenuInterface(
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    years: List<String>,
+    onUpdateData: (Int) -> Unit
+) {
+    Box {
+        Button(
+            onClick = { onExpandedChange.invoke(true) }
+        ) {
+            Text("Select Year")
+        }
+        DropdownMenu(
+            modifier = Modifier.align(Alignment.BottomEnd),
+            expanded = expanded,
+            onDismissRequest = { onExpandedChange.invoke(false) }
+        ) {
+            years.forEach {
+                DropdownMenuItem(
+                    text = { Text(it) },
+                    onClick = {
+                        onUpdateData.invoke(it.toInt())
+                    }
+                )
+            }
+        }
+
     }
 }

@@ -53,7 +53,7 @@ class ExpenseViewModel @Inject constructor(
                     description = description,
                     cost = cost,
                     payment = payment,
-                    date = System.currentTimeMillis()
+                    date = 1726410880000
                 )
             )
             // Clean values

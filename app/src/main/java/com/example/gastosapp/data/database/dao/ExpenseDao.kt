@@ -68,6 +68,13 @@ interface ExpenseDao {
     suspend fun getPaymentsByMonth(year: String): List<MonthlyTotalDb>
 
     @Query("""
+    SELECT DISTINCT strftime('%Y', datetime(date / 1000, 'unixepoch')) AS year
+    FROM expenses
+    ORDER BY year DESC
+""")
+    suspend fun getAvailableYears(): List<String>
+
+    @Query("""
         SELECT e.id, e.description, e.cost, e.payment, e.date, 
            e.clientId, e.productId, e.status,
            c.firstName AS clientFirstName, 
