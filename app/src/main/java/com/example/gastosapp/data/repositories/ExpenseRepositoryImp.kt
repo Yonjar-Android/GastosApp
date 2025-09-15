@@ -1,5 +1,8 @@
 package com.example.gastosapp.data.repositories
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.gastosapp.data.database.dao.ExpenseDao
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
@@ -26,16 +29,18 @@ class ExpenseRepositoryImp @Inject constructor(
         return expenseDao.getExpenseById(id)
     }
 
-    override fun getAllExpenses(): Flow<List<ExpenseWithDetails>> {
-        return expenseDao.getAllExpensesWithDetails()
+    override fun getAllExpenses(): Flow<PagingData<ExpenseWithDetails>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 20),
+            pagingSourceFactory = { expenseDao.getAllExpensesWithDetails() }
+        ).flow
     }
 
-    override fun getExpensesByClientId(clientId: Long): Flow<List<ExpenseWithDetails>> {
-        return expenseDao.getExpensesByClientId(clientId)
-    }
-
-    override suspend fun getExpensesByProduct(productId: Long): List<ExpenseEntity> {
-        return emptyList()
+    override fun getExpensesByClientId(clientId: Long): Flow<PagingData<ExpenseWithDetails>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 20),
+            pagingSourceFactory = { expenseDao.getExpensesByClientId(clientId) }
+        ).flow
     }
 
     override suspend fun getPaymentsByMonth(year: Int): List<Double> {

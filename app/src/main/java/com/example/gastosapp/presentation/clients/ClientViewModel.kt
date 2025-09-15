@@ -53,12 +53,6 @@ class ClientViewModel @Inject constructor(
         }
     }
 
-    fun getClientById(id: Long) {
-        viewModelScope.launch {
-            clientRepository.getClientById(id)
-        }
-    }
-
     // Fields
     var firstName by mutableStateOf("")
         private set

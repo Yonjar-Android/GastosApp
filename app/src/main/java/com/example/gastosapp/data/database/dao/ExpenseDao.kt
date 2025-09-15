@@ -1,5 +1,6 @@
 package com.example.gastosapp.data.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -48,13 +49,7 @@ interface ExpenseDao {
     INNER JOIN products p ON e.productId = p.id
     WHERE e.status = 0
 """)
-    fun getAllExpensesWithDetails(): Flow<List<ExpenseWithDetails>>
-
-    @Query("SELECT * FROM expenses WHERE clientId = :clientId")
-    suspend fun getExpensesByClient(clientId: Long): List<ExpenseEntity>
-
-    @Query("SELECT * FROM expenses WHERE productId = :productId")
-    suspend fun getExpensesByProduct(productId: Long): List<ExpenseEntity>
+    fun getAllExpensesWithDetails(): PagingSource<Int, ExpenseWithDetails>
 
     @Query("""
     SELECT strftime('%m', datetime(date / 1000, 'unixepoch')) AS month,
@@ -86,5 +81,5 @@ interface ExpenseDao {
     WHERE clientId = :clientId
     ORDER BY e.date DESC
     """)
-    fun getExpensesByClientId(clientId: Long): Flow<List<ExpenseWithDetails>>
+    fun getExpensesByClientId(clientId: Long): PagingSource<Int,ExpenseWithDetails>
 }

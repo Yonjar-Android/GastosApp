@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -36,8 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
 
@@ -47,7 +48,8 @@ fun PndExpensesScreen(
     navController: NavHostController
 ) {
 
-    val expenses by viewModel.expenses.collectAsStateWithLifecycle()
+    val expenses: LazyPagingItems<ExpenseWithDetails> =
+        viewModel.expenses.collectAsLazyPagingItems()
 
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     var showConfirmDialog by rememberSaveable { mutableStateOf(false) }
@@ -66,19 +68,26 @@ fun PndExpensesScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         LazyColumn {
-            items(expenses) { expense ->
-                ExpenseItem(
-                    expense,
-                    navController = navController,
-                    onConfirm = {
-                        expenseToModify = it
-                        showConfirmDialog = true
-                    },
-                    onDelete = {
-                        showDeleteDialog = true
-                        expenseToModify = it
-                    })
-                Spacer(modifier = Modifier.height(8.dp))
+            items(
+                count = expenses.itemCount,
+                key = expenses.itemKey{ expense -> expense.id }
+            ) { expense ->
+                val expenseItem = expenses[expense]
+
+                if (expenseItem != null) {
+                    ExpenseItem(
+                        expenseItem,
+                        navController = navController,
+                        onConfirm = {
+                            expenseToModify = it
+                            showConfirmDialog = true
+                        },
+                        onDelete = {
+                            showDeleteDialog = true
+                            expenseToModify = it
+                        })
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
@@ -264,9 +273,10 @@ fun DeleteDialog(
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0XFF1A80E5)
-                        )) {
-                            Text(text = "Yes")
-                        }
+                        )
+                    ) {
+                        Text(text = "Yes")
+                    }
                 }
 
             }

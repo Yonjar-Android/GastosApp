@@ -2,6 +2,7 @@ package com.example.gastosapp.data.repositories
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.paging.PagingData
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
 import kotlinx.coroutines.flow.Flow
@@ -12,10 +13,9 @@ interface ExpenseRepository {
     suspend fun update(expense: ExpenseEntity)
     suspend fun delete(expense: ExpenseEntity)
     suspend fun getExpenseById(id: Long): ExpenseWithDetails?
-    fun getAllExpenses(): Flow<List<ExpenseWithDetails>>
+    fun getAllExpenses(): Flow<PagingData<ExpenseWithDetails>>
 
-    fun getExpensesByClientId(clientId: Long): Flow<List<ExpenseWithDetails>>
-    suspend fun getExpensesByProduct(productId: Long): List<ExpenseEntity>
+    fun getExpensesByClientId(clientId: Long): Flow<PagingData<ExpenseWithDetails>>
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun getPaymentsByMonth(year: Int = LocalDate.now().year): List<Double>
