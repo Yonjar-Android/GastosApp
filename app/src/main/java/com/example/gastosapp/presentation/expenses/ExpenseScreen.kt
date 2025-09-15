@@ -46,6 +46,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.data.database.entities.ProductEntity
@@ -84,8 +87,10 @@ fun MainExpenseScreen(
 @Composable
 fun ExpenseScreen(viewModel: ExpenseViewModel) {
 
-    val clients by viewModel.clients.collectAsStateWithLifecycle()
-    val products by viewModel.products.collectAsStateWithLifecycle()
+    val clients: LazyPagingItems<ClientEntity> =
+        viewModel.clientsPagedData.collectAsLazyPagingItems()
+
+    val products: LazyPagingItems<ProductEntity> = viewModel.products.collectAsLazyPagingItems()
 
     val context = LocalContext.current
 
@@ -104,20 +109,24 @@ fun ExpenseScreen(viewModel: ExpenseViewModel) {
                 WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
             ) -> {
 
-                FormExpense(viewModel, context,
-                    modifier = Modifier.weight(1f))
+                FormExpense(
+                    viewModel, context,
+                    modifier = Modifier.weight(1f)
+                )
             }
             // Screen >= 600dp
             windowsSizeClass.isWidthAtLeastBreakpoint(
                 WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
             ) -> {
-                FormExpense(viewModel, context,
-                    modifier = Modifier.weight(1f))
+                FormExpense(
+                    viewModel, context,
+                    modifier = Modifier.weight(1f)
+                )
             }
 
             // Screen < 600dp
             else -> {
-                    FormExpense(viewModel, context, modifier = Modifier.weight(1f))
+                FormExpense(viewModel, context, modifier = Modifier.weight(1f))
             }
         }
     }
@@ -282,7 +291,7 @@ fun TextFieldEdit(
 
 @Composable
 fun TableClients(
-    clients: List<ClientEntity>, onDismiss: () -> Unit = {},
+    clients: LazyPagingItems<ClientEntity>, onDismiss: () -> Unit = {},
     onClientSelected: (ClientEntity) -> Unit
 ) {
     Dialog(
@@ -296,7 +305,7 @@ fun TableClients(
                 .fillMaxWidth(0.95f)
                 .padding(16.dp)
         ) {
-            if (clients.isEmpty()) {
+            if (clients.itemCount == 0) {
                 Text(text = "No clients found", modifier = Modifier.padding(24.dp))
             } else {
                 Column(
@@ -307,29 +316,35 @@ fun TableClients(
                             .padding(16.dp)
                             .weight(1f)
                     ) {
-                        items(clients) { client ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp), // espacio entre filas
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "${client.firstName} ${client.lastName}",
-                                    fontSize = 16.sp
-                                )
-
-                                Button(
-                                    onClick = {
-                                        onClientSelected.invoke(client)
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0XFF1A80E5),
-                                        contentColor = Color.White
-                                    )
+                        items(
+                            count = clients.itemCount,
+                            key = clients.itemKey { client -> client.id }
+                        ) { client ->
+                            val clientValue = clients[client]
+                            if (clientValue != null) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp), // espacio entre filas
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text(text = "Select")
+                                    Text(
+                                        text = "${clientValue.firstName} ${clientValue.lastName}",
+                                        fontSize = 16.sp
+                                    )
+
+                                    Button(
+                                        onClick = {
+                                            onClientSelected.invoke(clientValue)
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0XFF1A80E5),
+                                            contentColor = Color.White
+                                        )
+                                    ) {
+                                        Text(text = "Select")
+                                    }
                                 }
                             }
                         }
@@ -356,7 +371,7 @@ fun TableClients(
 
 @Composable
 fun TableProducts(
-    products: List<ProductEntity>, onDismiss: () -> Unit = {},
+    products: LazyPagingItems<ProductEntity>, onDismiss: () -> Unit = {},
     onProductSelected: (ProductEntity) -> Unit
 ) {
     Dialog(
@@ -370,7 +385,7 @@ fun TableProducts(
                 .fillMaxWidth(0.95f)
                 .padding(16.dp)
         ) {
-            if (products.isEmpty()) {
+            if (products.itemCount == 0) {
                 Text(text = "No products found", modifier = Modifier.padding(24.dp))
             } else {
                 Column(
@@ -381,29 +396,36 @@ fun TableProducts(
                             .padding(16.dp)
                             .weight(1f)
                     ) {
-                        items(products) { product ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp), // espacio entre filas
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = product.productName,
-                                    fontSize = 16.sp
-                                )
+                        items(
+                            count = products.itemCount,
+                            key = products.itemKey { product -> product.id }
+                        ) { product ->
+                            val productValue = products[product]
+                            if (productValue != null) {
 
-                                Button(
-                                    onClick = {
-                                        onProductSelected.invoke(product)
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0XFF1A80E5),
-                                        contentColor = Color.White
-                                    )
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp), // espacio entre filas
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    Text(text = "Select")
+                                    Text(
+                                        text = productValue.productName,
+                                        fontSize = 16.sp
+                                    )
+
+                                    Button(
+                                        onClick = {
+                                            onProductSelected.invoke(productValue)
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0XFF1A80E5),
+                                            contentColor = Color.White
+                                        )
+                                    ) {
+                                        Text(text = "Select")
+                                    }
                                 }
                             }
                         }
@@ -431,7 +453,7 @@ fun TableProducts(
 fun validations(
     clientName: String,
     product: String,
-        cost: String,
+    cost: String,
     payment: String
 ): String {
     if (clientName.isEmpty()) {

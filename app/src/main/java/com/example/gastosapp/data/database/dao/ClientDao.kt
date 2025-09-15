@@ -1,5 +1,6 @@
 package com.example.gastosapp.data.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -7,7 +8,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.gastosapp.data.database.entities.ClientEntity
-import kotlinx.coroutines.flow.Flow
 
 @Dao
     interface ClientDao {
@@ -25,5 +25,5 @@ import kotlinx.coroutines.flow.Flow
         suspend fun getClientById(id: Long): ClientEntity?
 
         @Query("SELECT * FROM clients")
-        fun getAllClients(): Flow<List<ClientEntity>>
+        fun getAllClients(): PagingSource<Int,ClientEntity>
     }

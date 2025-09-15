@@ -1,5 +1,6 @@
 package com.example.gastosapp.data.repositories
 
+import androidx.paging.PagingData
 import com.example.gastosapp.data.database.entities.ClientEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -9,5 +10,5 @@ interface ClientRepository {
     suspend fun delete(client: ClientEntity)
     suspend fun getClientById(id: Long): ClientEntity?
 
-    fun getAllClients(): Flow<List<ClientEntity>>
+    fun getAllClients(): Flow<PagingData<ClientEntity>>
 }

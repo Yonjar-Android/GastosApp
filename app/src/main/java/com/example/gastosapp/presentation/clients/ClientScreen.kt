@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -44,8 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
@@ -56,7 +57,7 @@ fun ClientScreen(
     navHostController: NavHostController
 ) {
 
-    val clients = clientViewModel.clients.collectAsStateWithLifecycle()
+    val clients: LazyPagingItems<ClientEntity> = clientViewModel.clientsPagedData.collectAsLazyPagingItems()
 
     val context = LocalContext.current
 
@@ -70,7 +71,7 @@ fun ClientScreen(
             ClientScreenExpanded(
                 clientViewModel,
                 context,
-                clients.value,
+                clients,
                 navHostController
             )
         }
@@ -81,7 +82,7 @@ fun ClientScreen(
             ClientScreenExpanded(
                 clientViewModel,
                 context,
-                clients.value,
+                clients,
                 navHostController
             )
         }
@@ -90,7 +91,7 @@ fun ClientScreen(
             ClientScreenCompact(
                 clientViewModel,
                 context,
-                clients.value,
+                clients,
                 navHostController)
         }
     }
@@ -117,7 +118,7 @@ fun ClientScreen(
 fun ClientScreenExpanded(
     clientViewModel: ClientViewModel,
     context: Context,
-    clients: List<ClientEntity>,
+    clients: LazyPagingItems<ClientEntity>,
     navHostController: NavHostController
 ) {
 
@@ -152,7 +153,7 @@ fun ClientScreenExpanded(
 fun ClientScreenCompact(
     clientViewModel: ClientViewModel,
     context: Context,
-    clients: List<ClientEntity>,
+    clients: LazyPagingItems<ClientEntity>,
     navHostController: NavHostController
 ) {
     Column(
@@ -257,7 +258,8 @@ fun ClientItem(
 
 @Composable
 fun ClientsList(
-    clientViewModel: ClientViewModel, clients: List<ClientEntity>,
+    clientViewModel: ClientViewModel,
+    clients: LazyPagingItems<ClientEntity>,
     textModifier: Modifier,
     navHostController: NavHostController
 ) {
@@ -273,14 +275,23 @@ fun ClientsList(
             .fillMaxWidth(fraction = 0.95f)
             .padding(start = 16.dp),
     ) {
-        items(clients) { client ->
-            ClientItem(client, openDialogDelete = {
-                clientViewModel.openDeleteDialog(client)
-            }, openDialog = {
-                clientViewModel.openEditDialog(client)
-            }, navHostController = navHostController)
+        items(
+            count = clients.itemCount,
+            key = clients.itemKey{ client -> client.id }
+        ) { client ->
 
-            Spacer(modifier = Modifier.height(8.dp))
+            val clientValue = clients[client]
+
+            if (clientValue != null){
+                ClientItem(clientValue, openDialogDelete = {
+                    clientViewModel.openDeleteDialog(clientValue)
+                }, openDialog = {
+                    clientViewModel.openEditDialog(clientValue)
+                }, navHostController = navHostController)
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
         }
     }
 }

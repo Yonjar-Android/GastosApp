@@ -1,5 +1,8 @@
 package com.example.gastosapp.data.repositories
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.gastosapp.data.database.dao.ProductDao
 import com.example.gastosapp.data.database.entities.ProductEntity
 import jakarta.inject.Inject
@@ -20,7 +23,12 @@ class ProductRepositoryImp @Inject constructor(
         productDao.delete(product)
     }
 
-    override fun getAllProducts(): Flow<List<ProductEntity>> {
-        return productDao.getAllProducts()
+    override fun getAllProducts(): Flow<PagingData<ProductEntity>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 20),
+            pagingSourceFactory = {
+                productDao.getAllProducts()
+            }
+        ).flow
     }
 }

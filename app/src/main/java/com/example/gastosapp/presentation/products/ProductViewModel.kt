@@ -5,27 +5,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.gastosapp.data.database.entities.ProductEntity
 import com.example.gastosapp.data.repositories.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
     private val productRepository: ProductRepository
 ): ViewModel() {
-    val products: StateFlow<List<ProductEntity>>
+    val products: Flow<PagingData<ProductEntity>>
     = productRepository.getAllProducts()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Companion.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
+        .cachedIn(viewModelScope)
     fun insertProduct(){
         viewModelScope.launch {
             productRepository.insertProduct(

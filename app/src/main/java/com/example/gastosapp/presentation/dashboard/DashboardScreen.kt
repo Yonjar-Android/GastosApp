@@ -17,6 +17,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
@@ -323,7 +324,11 @@ fun DropMenuInterface(
 ) {
     Box {
         Button(
-            onClick = { onExpandedChange.invoke(true) }
+            onClick = { onExpandedChange.invoke(true) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0XFF1A80E5),
+                contentColor = Color.White
+            )
         ) {
             Text("Select Year")
         }

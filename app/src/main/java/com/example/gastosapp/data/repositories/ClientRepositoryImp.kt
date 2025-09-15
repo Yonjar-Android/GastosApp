@@ -1,5 +1,8 @@
 package com.example.gastosapp.data.repositories
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.gastosapp.data.database.dao.ClientDao
 import com.example.gastosapp.data.database.entities.ClientEntity
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +28,10 @@ class ClientRepositoryImp @Inject constructor(
         return clientDao.getClientById(id)
     }
 
-    override fun getAllClients(): Flow<List<ClientEntity>> {
-        return clientDao.getAllClients()
+    override fun getAllClients(): Flow<PagingData<ClientEntity>> {
+        return Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 20),
+            pagingSourceFactory = { clientDao.getAllClients() }
+        ).flow
     }
 }

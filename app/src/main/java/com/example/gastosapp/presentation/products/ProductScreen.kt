@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -43,7 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowSizeClass
 import com.example.gastosapp.data.database.entities.ProductEntity
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
@@ -53,7 +54,8 @@ fun ProductScreen(
     productViewModel: ProductViewModel = hiltViewModel()
 ) {
 
-    val products = productViewModel.products.collectAsStateWithLifecycle()
+    val products: LazyPagingItems<ProductEntity> =
+        productViewModel.products.collectAsLazyPagingItems()
 
     val context = LocalContext.current
 
@@ -65,19 +67,19 @@ fun ProductScreen(
             ProductScreenExpanded(
                 productViewModel,
                 context,
-                products.value
+                products
             )
         }
         // Screen >= 600dp
         windowsSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> {
-            ProductScreenExpanded(productViewModel, context, products.value)
+            ProductScreenExpanded(productViewModel, context, products)
         }
         // Screen < 600dp
         else -> {
             ProductScreenCompact(
                 productViewModel,
                 context,
-                products.value
+                products
             )
         }
     }
@@ -102,7 +104,7 @@ fun ProductScreen(
 fun ProductScreenExpanded(
     productViewModel: ProductViewModel,
     context: Context,
-    products: List<ProductEntity>
+    products: LazyPagingItems<ProductEntity>
 ) {
 
     Row {
@@ -135,7 +137,7 @@ fun ProductScreenExpanded(
 fun ProductScreenCompact(
     productViewModel: ProductViewModel,
     context: Context,
-    products: List<ProductEntity>
+    products: LazyPagingItems<ProductEntity>
 ) {
 
     Column(
@@ -159,7 +161,7 @@ fun ProductScreenCompact(
 @Composable
 fun ProductList(
     productViewModel: ProductViewModel,
-    products: List<ProductEntity>,
+    products: LazyPagingItems<ProductEntity>,
     textModifier: Modifier
 ) {
     Text(
@@ -175,30 +177,38 @@ fun ProductList(
             .fillMaxWidth(fraction = 0.95f)
             .padding(start = 16.dp),
     ) {
-        items(products) { product ->
+        items(
+            count = products.itemCount,
+            key = products.itemKey { product -> product.id }
+        ) { product ->
 
-            Row(
-                modifier = Modifier.fillMaxWidth(fraction = 0.95f),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = product.productName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            val productValue = products[product]
 
-                Row {
-                    IconButton(
-                        onClick = {
-                            productViewModel.openEditDialog(product)
+
+            if (productValue != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(fraction = 0.95f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = productValue.productName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+
+                    Row {
+                        IconButton(
+                            onClick = {
+                                productViewModel.openEditDialog(productValue)
+                            }
+                        ) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
                         }
-                    ) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                    }
 
-                    IconButton(
-                        onClick = {
-                            productViewModel.openDeleteDialog(product)
+                        IconButton(
+                            onClick = {
+                                productViewModel.openDeleteDialog(productValue)
+                            }
+                        ) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                         }
-                    ) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                     }
                 }
             }
