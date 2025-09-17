@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +47,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowSizeClass
+import com.example.gastosapp.R
 import com.example.gastosapp.data.database.entities.ProductEntity
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
 
@@ -165,7 +167,7 @@ fun ProductList(
     textModifier: Modifier
 ) {
     Text(
-        text = "Products", fontSize = 24.sp, fontWeight = FontWeight.Bold,
+        text = stringResource(R.string.createProductStr), fontSize = 24.sp, fontWeight = FontWeight.Bold,
         modifier = textModifier
             .padding(start = 24.dp)
     )
@@ -221,20 +223,23 @@ fun ProductForm(
     productViewModel: ProductViewModel,
     context: Context
 ) {
-    Text(text = "Create Product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Text(text = stringResource(R.string.createProductStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
     Spacer(modifier = Modifier.height(24.dp))
 
     TextFieldEdit(
         value = productViewModel.productName,
         onValueChange = { productViewModel.onProductNameChange(it) },
-        title = "Product Name"
+        title = stringResource(R.string.productNameStr)
     )
+
+    val messageValidation = stringResource(R.string.productNameRqStr)
 
     Button(
         onClick = {
             if (productViewModel.productName.isEmpty()) {
-                Toast.makeText(context, "Product name is required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, messageValidation
+                    , Toast.LENGTH_SHORT).show()
             } else {
                 productViewModel.insertProduct()
                 // clean values
@@ -250,7 +255,7 @@ fun ProductForm(
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.saveStr), fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -273,14 +278,14 @@ fun DialogProductEdit(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Edit product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.editProductStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextFieldEdit(
                     value = productViewModel.productNameEdit,
                     onValueChange = { productViewModel.onProductNameEditChange(it) },
-                    title = "Product's Name"
+                    title = stringResource(R.string.productNameStr)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -290,16 +295,19 @@ fun DialogProductEdit(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancelStr))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
+
+                    val messageValidation = stringResource(R.string.productNameRqStr)
+
                     Button(
                         onClick = {
 
                             if (productViewModel.productNameEdit.isEmpty()) {
                                 Toast.makeText(
                                     context,
-                                    "Product name is required",
+                                    messageValidation,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
@@ -312,7 +320,7 @@ fun DialogProductEdit(
                             contentColor = Color.White
                         )
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.saveStr))
                     }
                 }
             }
@@ -341,13 +349,13 @@ fun DialogProductDelete(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Delete product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.deleteProductStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     buildAnnotatedString {
-                        append("Would you like to delete the product: ")
+                        append("${stringResource(R.string.wouldYouLikeDelProdStr)}:")
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
                             append("${productViewModel.productToEdit?.productName}?")
                         }
@@ -365,7 +373,7 @@ fun DialogProductDelete(
                 TextFieldEdit(
                     value = validNumber,
                     onValueChange = { validNumber = it },
-                    title = "Enter the number to confirm"
+                    title = stringResource(R.string.enterNumberAboveStr)
                 )
 
 
@@ -376,7 +384,7 @@ fun DialogProductDelete(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancelStr))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -389,7 +397,7 @@ fun DialogProductDelete(
                         ),
                         enabled = validNumber == numberGenerator.toString()
                     ) {
-                        Text("Delete")
+                        Text(stringResource(R.string.deleteStr))
                     }
                 }
             }

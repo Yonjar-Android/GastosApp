@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.example.gastosapp.R
 import com.example.gastosapp.data.database.entities.ExpenseEntity
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
 
@@ -63,7 +65,7 @@ fun PndExpensesScreen(
     ) {
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(text = "Pending Expenses", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.pendingExpensesStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -143,11 +145,11 @@ fun ExpenseItem(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "Client: ${expense.clientFirstName} ${expense.clientLastName}",
+                text = "${stringResource(R.string.clientStr)}: ${expense.clientFirstName} ${expense.clientLastName}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(text = "Product: ${expense.productName}", fontSize = 16.sp)
+            Text(text = "${stringResource(R.string.productStr)}: ${expense.productName}", fontSize = 16.sp)
         }
 
         Column(
@@ -192,7 +194,7 @@ fun ExpenseItem(
                     contentColor = Color.White
                 )
             ) {
-                Text("Delete")
+                Text(stringResource(R.string.deleteStr))
             }
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -217,7 +219,7 @@ fun ExpenseItem(
                     contentColor = Color.White
                 )
             ) {
-                Text("Confirm payment")
+                Text(stringResource(R.string.confirmPaymentStr))
             }
         }
     }
@@ -275,7 +277,7 @@ fun DeleteDialog(
                             containerColor = Color(0XFF1A80E5)
                         )
                     ) {
-                        Text(text = "Yes")
+                        Text(text = stringResource(R.string.yesStr))
                     }
                 }
 
@@ -335,7 +337,7 @@ fun ConfirmDialog(
                             containerColor = Color(0XFF1A80E5)
                         )
                     ) {
-                        Text(text = "Yes")
+                        Text(text = stringResource(R.string.yesStr))
                     }
                 }
             }

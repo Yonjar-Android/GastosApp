@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.example.gastosapp.R
 import com.example.gastosapp.data.database.entities.ExpenseWithDetails
 
 @Composable
@@ -62,7 +64,7 @@ fun ClientDetailScreen(
             }
 
             Text(
-                text = "Client Details",
+                text = stringResource(R.string.clientDetailsStr),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
@@ -76,7 +78,7 @@ fun ClientDetailScreen(
         Spacer(modifier = Modifier.height(16.dp))
         if (expenses.itemCount != 0) {
             Text(
-                text = "Client Name: ${expenses[0]?.clientFirstName} ${expenses[0]?.clientLastName}",
+                text = "${stringResource(R.string.clientNameStr)}: ${expenses[0]?.clientFirstName} ${expenses[0]?.clientLastName}",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             )
@@ -108,7 +110,7 @@ fun ItemExpense(details: ExpenseWithDetails) {
         Column {
             Text(text = details.productName, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Text(
-                text = "Payment: C$ ${details.payment}",
+                text = "${stringResource(R.string.paymentStr)}: C$ ${details.payment}",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0XFF1AA708)
@@ -118,12 +120,12 @@ fun ItemExpense(details: ExpenseWithDetails) {
         Column {
             if (details.status) {
                 Text(
-                    text = "Paid", fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                    text = stringResource(R.string.paidStr), fontSize = 18.sp, fontWeight = FontWeight.Bold,
                     color = Color(0XFF1AA708)
                 )
             } else {
                 Text(
-                    text = "Pending", fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                    text = stringResource(R.string.pendingStr), fontSize = 18.sp, fontWeight = FontWeight.Bold,
                     color = Color.Red
                 )
             }

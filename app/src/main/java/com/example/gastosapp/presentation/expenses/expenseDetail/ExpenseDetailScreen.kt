@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -31,9 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import java.time.Instant
-import java.time.ZoneId
-import kotlin.math.exp
+import com.example.gastosapp.R
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -66,7 +65,7 @@ fun ExpenseDetailScreen(
             }
 
             Text(
-                text = "Expense Details",
+                text = stringResource(R.string.expenseDtlStr),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
@@ -87,7 +86,7 @@ fun ExpenseDetailScreen(
                 modifier = Modifier.weight(1f),
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Client:")
+                        append("${stringResource(R.string.clientStr)}:")
                     }
                     append("\n")
                     append("${expense?.clientFirstName} ${expense?.clientLastName}")
@@ -101,7 +100,7 @@ fun ExpenseDetailScreen(
                 modifier = Modifier.weight(1f),
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Product:")
+                        append("${stringResource(R.string.productStr)}:")
                     }
                     append("\n")
                     append(expense?.productName)
@@ -125,7 +124,7 @@ fun ExpenseDetailScreen(
                 modifier = Modifier.weight(1f),
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Date:")
+                        append("${stringResource(R.string.dateStr)}:")
                     }
                     append("\n")
                     append(formattedDate)
@@ -139,13 +138,13 @@ fun ExpenseDetailScreen(
                 modifier = Modifier.weight(1f),
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("State:")
+                        append("${stringResource(R.string.stateStr)}:")
                     }
                     append("\n")
                     if (expense?.status == true){
-                        append("Paid")
+                        append(stringResource(R.string.paidStr))
                     }else{
-                        append("Pending")
+                        append(stringResource(R.string.pendingStr))
                     }
                 },
                 textAlign = TextAlign.Center
@@ -161,7 +160,7 @@ fun ExpenseDetailScreen(
                 modifier = Modifier.weight(1f),
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Cost:")
+                        append("${stringResource(R.string.costStr)}:")
                     }
                     append("\n")
                     append("${expense?.cost} C$")
@@ -175,7 +174,7 @@ fun ExpenseDetailScreen(
                 modifier = Modifier.weight(1f),
                 text = buildAnnotatedString {
                     withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                        append("Payment:")
+                        append("${stringResource(R.string.paymentStr)}:")
                     }
                     append("\n")
                     append("${expense?.payment} C$")
@@ -190,7 +189,7 @@ fun ExpenseDetailScreen(
         Text(
             buildAnnotatedString {
                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append("Description: ")
+                    append("${stringResource(R.string.descriptionStr)}: ")
                 }
                 append("\n")
                 append(expense?.description)

@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowSizeClass
+import com.example.gastosapp.R
 import com.mahmoud.composecharts.barchart.BarChart
 import com.mahmoud.composecharts.barchart.BarChartEntity
 import java.time.LocalDate
@@ -225,7 +227,7 @@ fun SummaryInfo(
     costByMonth: List<Double>,
     year: Int = LocalDate.now().year
 ) {
-    Text("Summary $year", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+    Text("${stringResource(R.string.selectYearStr)} $year", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
     Spacer(modifier = Modifier.height(16.dp))
 
@@ -249,7 +251,7 @@ fun SummaryInfo(
                     .padding(10.dp),
             ) {
                 Text(
-                    "Total Owed", fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
+                    stringResource(R.string.totalOwedStr), fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center
                 )
 
@@ -271,7 +273,7 @@ fun SummaryInfo(
 
                 ) {
                 Text(
-                    "Total Received", fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
+                    stringResource(R.string.totalReceivedStr), fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center
                 )
 
@@ -300,7 +302,8 @@ fun SummaryInfo(
 
                 ) {
                 Text(
-                    "Net Profit", fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
+                    stringResource(R.string.netProfitStr)
+                    , fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                     textAlign = TextAlign.Center
                 )
 
@@ -330,7 +333,7 @@ fun DropMenuInterface(
                 contentColor = Color.White
             )
         ) {
-            Text("Select Year")
+            Text(stringResource(R.string.selectYearStr))
         }
         DropdownMenu(
             modifier = Modifier.align(Alignment.BottomEnd),

@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowSizeClass
+import com.example.gastosapp.R
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.presentation.expenses.TextFieldEdit
 
@@ -176,26 +178,28 @@ fun ClientForm(
     clientViewModel: ClientViewModel,
     context: Context
 ) {
-    Text(text = "Create Client", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Text(text = stringResource(R.string.createClientStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
     Spacer(modifier = Modifier.height(24.dp))
 
     TextFieldEdit(
         value = clientViewModel.firstName,
         onValueChange = { clientViewModel.onFirstNameChange(it) },
-        title = "First Name"
+        title = stringResource(R.string.firstNameStr)
     )
 
     TextFieldEdit(
         value = clientViewModel.lastName,
         onValueChange = { clientViewModel.onLastNameChange(it) },
-        title = "Last Name"
+        title = stringResource(R.string.lastNameStr)
     )
+
+    val messageValidation = stringResource(R.string.firstNameRqStr)
 
     Button(
         onClick = {
             if (clientViewModel.firstName.isEmpty()) {
-                Toast.makeText(context, "First name is required", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,messageValidation , Toast.LENGTH_SHORT).show()
             } else {
                 clientViewModel.insertClient()
                 // clean values
@@ -212,7 +216,7 @@ fun ClientForm(
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.saveStr), fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -264,7 +268,7 @@ fun ClientsList(
     navHostController: NavHostController
 ) {
     Text(
-        text = "Clients", fontSize = 24.sp, fontWeight = FontWeight.Bold,
+        text = stringResource(R.string.clientsStr), fontSize = 24.sp, fontWeight = FontWeight.Bold,
         modifier = textModifier.padding(start = 24.dp)
     )
 
@@ -314,19 +318,19 @@ fun DialogClientEdit(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Edit client", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.editClientStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TextFieldEdit(
                     value = viewModel.firstNameEdit,
                     onValueChange = { viewModel.onFirstNameEditChange(it) },
-                    title = "First Name"
+                    title = stringResource(R.string.firstNameStr)
                 )
                 TextFieldEdit(
                     value = viewModel.lastNameEdit,
                     onValueChange = { viewModel.onLastNameEditChange(it) },
-                    title = "Last Name"
+                    title = stringResource(R.string.lastNameStr)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -336,16 +340,19 @@ fun DialogClientEdit(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancelStr))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
+
+                    val messageValidation = stringResource(R.string.firstNameRqStr)
+
                     Button(
                         onClick = {
 
                             if (viewModel.firstNameEdit.isEmpty()) {
                                 Toast.makeText(
                                     context,
-                                    "First name is required",
+                                    messageValidation,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
@@ -358,7 +365,7 @@ fun DialogClientEdit(
                             contentColor = Color.White
                         )
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.saveStr))
                     }
                 }
             }
@@ -387,15 +394,15 @@ fun DialogClientDelete(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Delete client", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.deleteClientStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     buildAnnotatedString {
-                        append("Would you like to delete the user: ")
+                        append(stringResource(R.string.WouldYouLikeDelStr))
                         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("${viewModel.clientToEdit?.firstName} ${viewModel.clientToEdit?.lastName}?")
+                            append(": ${viewModel.clientToEdit?.firstName} ${viewModel.clientToEdit?.lastName}?")
                         }
                     },
                     fontSize = 16.sp,
@@ -411,7 +418,7 @@ fun DialogClientDelete(
                 TextFieldEdit(
                     value = validNumber,
                     onValueChange = { validNumber = it },
-                    title = "Enter the number above to confirm"
+                    title = stringResource(R.string.enterNumberAboveStr)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -421,7 +428,7 @@ fun DialogClientDelete(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancelStr))
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
@@ -436,7 +443,7 @@ fun DialogClientDelete(
                         ),
                         enabled = validNumber == numberGenerator.toString()
                     ) {
-                        Text("Delete")
+                        Text(stringResource(R.string.deleteStr))
                     }
                 }
             }

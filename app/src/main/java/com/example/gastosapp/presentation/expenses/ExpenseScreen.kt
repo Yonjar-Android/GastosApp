@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,6 +48,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import androidx.window.core.layout.WindowSizeClass
+import com.example.gastosapp.R
 import com.example.gastosapp.data.database.entities.ClientEntity
 import com.example.gastosapp.data.database.entities.ProductEntity
 
@@ -55,7 +57,8 @@ fun MainExpenseScreen(
     viewModel: ExpenseViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
-    val tabs = listOf("Add Expense", "Pending Expenses")
+    val tabs = listOf( stringResource(R.string.addExpenseStr),
+        stringResource(R.string.pendingExpensesStr))
 
     val selectedTabIndex = rememberSaveable { mutableIntStateOf(0) }
 
@@ -156,14 +159,14 @@ fun FormExpense(
     modifier: Modifier = Modifier
 ) {
 
-    Text(text = "Record Expense", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Text(text = stringResource(R.string.recordExpenseStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
 
     Spacer(modifier = Modifier.height(24.dp))
 
     TextFieldEdit(
         value = viewModel.clientName,
         onValueChange = {},
-        title = "Select Client",
+        title = stringResource(R.string.selectClientStr),
         readonlyValue = true,
         onClickListener = {
             viewModel.openDialogClient(true)
@@ -173,7 +176,7 @@ fun FormExpense(
     TextFieldEdit(
         value = viewModel.productName,
         onValueChange = {},
-        title = "Product",
+        title = stringResource(R.string.productStr),
         readonlyValue = true,
         onClickListener = {
             viewModel.onOpenDialogProductChange(true)
@@ -183,34 +186,34 @@ fun FormExpense(
     TextFieldEdit(
         value = viewModel.description,
         onValueChange = { viewModel.onDescriptionChanged(it) },
-        title = "Description (Optional)"
+        title = stringResource(R.string.descriptionOptStr)
     )
 
     TextFieldEdit(
         value = viewModel.costText,
         onValueChange = { viewModel.onCostChanged(it) },
-        title = "Cost",
+        title = stringResource(R.string.costStr),
         keyBoardType = KeyboardType.Number
     )
 
     TextFieldEdit(
         value = viewModel.paymentText,
         onValueChange = { viewModel.onPaymentChanged(it) },
-        title = "Amount to Collect",
+        title = stringResource(R.string.amountCollectStr),
         keyBoardType = KeyboardType.Number
     )
 
     Spacer(modifier = modifier)
 
+    val response = validations(
+        viewModel.clientName,
+        viewModel.productName,
+        viewModel.costText,
+        viewModel.paymentText
+    )
+
     Button(
         onClick = {
-            val response = validations(
-                viewModel.clientName,
-                viewModel.productName,
-                viewModel.costText,
-                viewModel.paymentText
-            )
-
             if (response.isNotEmpty()) {
                 Toast.makeText(context, response, Toast.LENGTH_SHORT).show()
             } else {
@@ -229,7 +232,7 @@ fun FormExpense(
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = "Save", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = stringResource(R.string.saveStr), fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -303,7 +306,7 @@ fun TableClients(
                 .padding(16.dp)
         ) {
             if (clients.itemCount == 0) {
-                Text(text = "No clients found", modifier = Modifier.padding(24.dp))
+                Text(text = stringResource(R.string.noClientsFoundStr), modifier = Modifier.padding(24.dp))
             } else {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -339,8 +342,8 @@ fun TableClients(
                                             containerColor = Color(0XFF1A80E5),
                                             contentColor = Color.White
                                         )
-                                    ) {
-                                        Text(text = "Select")
+                                        ) {
+                                        Text(text = stringResource(R.string.selectStr))
                                     }
                                 }
                             }
@@ -357,7 +360,7 @@ fun TableClients(
                             .fillMaxWidth(fraction = 0.95f)
 
                     ) {
-                        Text(text = "Close")
+                        Text(text = stringResource(R.string.closeStr))
                     }
                 }
 
@@ -383,7 +386,7 @@ fun TableProducts(
                 .padding(16.dp)
         ) {
             if (products.itemCount == 0) {
-                Text(text = "No products found", modifier = Modifier.padding(24.dp))
+                Text(text = stringResource(R.string.noProductsFoundStr), modifier = Modifier.padding(24.dp))
             } else {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -421,7 +424,7 @@ fun TableProducts(
                                             contentColor = Color.White
                                         )
                                     ) {
-                                        Text(text = "Select")
+                                        Text(text = stringResource(R.string.selectStr))
                                     }
                                 }
                             }
@@ -438,7 +441,7 @@ fun TableProducts(
                             .fillMaxWidth(fraction = 0.95f)
 
                     ) {
-                        Text(text = "Close")
+                        Text(text = stringResource(R.string.closeStr))
                     }
                 }
 
@@ -447,6 +450,7 @@ fun TableProducts(
     }
 }
 
+@Composable
 fun validations(
     clientName: String,
     product: String,
@@ -454,23 +458,23 @@ fun validations(
     payment: String
 ): String {
     if (clientName.isEmpty()) {
-        return "Select a client"
+        return stringResource(R.string.selectClientMsgStr)
     }
     if (product.isEmpty()) {
-        return "Select a product"
+        return stringResource(R.string.selectProductMsgStr)
     }
 
     val costValue = cost.toDoubleOrNull()
-    if (costValue == null) return "Cost must be a number"
+    if (costValue == null) return stringResource(R.string.costMsgStr)
 
     val paymentValue = payment.toDoubleOrNull()
-    if (paymentValue == null) return "Payment must be a number"
+    if (paymentValue == null) return stringResource(R.string.paymentMsgStr)
 
     if (costValue <= 0.0) {
-        return "Enter valid a cost"
+        return stringResource(R.string.validCostStr)
     }
     if (paymentValue <= 0.0) {
-        return "Enter a valid payment"
+        return stringResource(R.string.validPaymentStr)
     }
     return ""
 }
