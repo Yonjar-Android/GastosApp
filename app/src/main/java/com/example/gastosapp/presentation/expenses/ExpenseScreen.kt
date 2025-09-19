@@ -57,8 +57,10 @@ fun MainExpenseScreen(
     viewModel: ExpenseViewModel = hiltViewModel(),
     navController: NavHostController
 ) {
-    val tabs = listOf( stringResource(R.string.addExpenseStr),
-        stringResource(R.string.pendingExpensesStr))
+    val tabs = listOf(
+        stringResource(R.string.addExpenseStr),
+        stringResource(R.string.pendingExpensesStr)
+    )
 
     val selectedTabIndex = rememberSaveable { mutableIntStateOf(0) }
 
@@ -159,7 +161,11 @@ fun FormExpense(
     modifier: Modifier = Modifier
 ) {
 
-    Text(text = stringResource(R.string.recordExpenseStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Text(
+        text = stringResource(R.string.recordExpenseStr),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
+    )
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -232,7 +238,11 @@ fun FormExpense(
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = stringResource(R.string.saveStr), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(R.string.saveStr),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -277,6 +287,8 @@ fun TextFieldEdit(
                 disabledLabelColor = Color.Black,
                 focusedLabelColor = Color.Black,
                 unfocusedLabelColor = Color.Black,
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color.Black
             ),
             textStyle = TextStyle(fontSize = 16.sp),
             readOnly = readonlyValue,
@@ -306,7 +318,11 @@ fun TableClients(
                 .padding(16.dp)
         ) {
             if (clients.itemCount == 0) {
-                Text(text = stringResource(R.string.noClientsFoundStr), modifier = Modifier.padding(24.dp))
+                Text(
+                    text = stringResource(R.string.noClientsFoundStr),
+                    modifier = Modifier.padding(24.dp),
+                    color = Color.Black
+                )
             } else {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -331,7 +347,8 @@ fun TableClients(
                                 ) {
                                     Text(
                                         text = "${clientValue.firstName} ${clientValue.lastName}",
-                                        fontSize = 16.sp
+                                        fontSize = 16.sp,
+                                        color = Color.Black
                                     )
 
                                     Button(
@@ -342,8 +359,8 @@ fun TableClients(
                                             containerColor = Color(0XFF1A80E5),
                                             contentColor = Color.White
                                         )
-                                        ) {
-                                        Text(text = stringResource(R.string.selectStr))
+                                    ) {
+                                        Text(text = stringResource(R.string.selectStr), color = Color.White)
                                     }
                                 }
                             }
@@ -386,7 +403,11 @@ fun TableProducts(
                 .padding(16.dp)
         ) {
             if (products.itemCount == 0) {
-                Text(text = stringResource(R.string.noProductsFoundStr), modifier = Modifier.padding(24.dp))
+                Text(
+                    text = stringResource(R.string.noProductsFoundStr),
+                    modifier = Modifier.padding(24.dp),
+                    color = Color.Black
+                )
             } else {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -412,7 +433,8 @@ fun TableProducts(
                                 ) {
                                     Text(
                                         text = productValue.productName,
-                                        fontSize = 16.sp
+                                        fontSize = 16.sp,
+                                        color = Color.Black
                                     )
 
                                     Button(
@@ -424,7 +446,8 @@ fun TableProducts(
                                             contentColor = Color.White
                                         )
                                     ) {
-                                        Text(text = stringResource(R.string.selectStr))
+                                        Text(text = stringResource(R.string.selectStr),
+                                            color = Color.White)
                                     }
                                 }
                             }

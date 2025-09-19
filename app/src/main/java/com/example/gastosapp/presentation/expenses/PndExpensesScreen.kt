@@ -251,7 +251,8 @@ fun DeleteDialog(
                 Text(
                     text = "Are you sure you want to delete this expense?",
                     fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp)
+                    textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp),
+                    color = Color.Black
                 )
 
                 Row(
@@ -263,7 +264,7 @@ fun DeleteDialog(
                     TextButton(onClick = {
                         onDismiss.invoke()
                     }) {
-                        Text(text = "No")
+                        Text(text = "No", color = Color.Black)
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -277,7 +278,8 @@ fun DeleteDialog(
                             containerColor = Color(0XFF1A80E5)
                         )
                     ) {
-                        Text(text = stringResource(R.string.yesStr))
+                        Text(text = stringResource(R.string.yesStr),
+                            color = Color.White)
                     }
                 }
 
@@ -313,7 +315,8 @@ fun ConfirmDialog(
                 Text(
                     text = "Are you sure you want to confirm this payment?",
                     fontSize = 16.sp, fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp)
+                    textAlign = TextAlign.Center, modifier = Modifier.padding(8.dp),
+                    color = Color.Black
                 )
 
                 Row(
@@ -325,7 +328,7 @@ fun ConfirmDialog(
                     TextButton(onClick = {
                         onDismiss.invoke()
                     }) {
-                        Text(text = "No")
+                        Text(text = "No", color = Color.Black)
                     }
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -337,7 +340,7 @@ fun ConfirmDialog(
                             containerColor = Color(0XFF1A80E5)
                         )
                     ) {
-                        Text(text = stringResource(R.string.yesStr))
+                        Text(text = stringResource(R.string.yesStr), color = Color.White)
                     }
                 }
             }

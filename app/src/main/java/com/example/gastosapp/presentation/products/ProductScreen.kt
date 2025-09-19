@@ -167,7 +167,9 @@ fun ProductList(
     textModifier: Modifier
 ) {
     Text(
-        text = stringResource(R.string.createProductStr), fontSize = 24.sp, fontWeight = FontWeight.Bold,
+        text = stringResource(R.string.createProductStr),
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
         modifier = textModifier
             .padding(start = 24.dp)
     )
@@ -193,7 +195,11 @@ fun ProductList(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = productValue.productName, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = productValue.productName,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
 
                     Row {
                         IconButton(
@@ -223,7 +229,12 @@ fun ProductForm(
     productViewModel: ProductViewModel,
     context: Context
 ) {
-    Text(text = stringResource(R.string.createProductStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Text(
+        text = stringResource(R.string.createProductStr),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 24.dp)
+    )
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -238,8 +249,9 @@ fun ProductForm(
     Button(
         onClick = {
             if (productViewModel.productName.isEmpty()) {
-                Toast.makeText(context, messageValidation
-                    , Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context, messageValidation, Toast.LENGTH_SHORT
+                ).show()
             } else {
                 productViewModel.insertProduct()
                 // clean values
@@ -255,7 +267,11 @@ fun ProductForm(
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = stringResource(R.string.saveStr), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(R.string.saveStr),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -278,7 +294,12 @@ fun DialogProductEdit(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.editProductStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.editProductStr),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -295,7 +316,10 @@ fun DialogProductEdit(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancelStr))
+                        Text(
+                            stringResource(R.string.cancelStr),
+                            color = Color.Black
+                        )
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -320,7 +344,10 @@ fun DialogProductEdit(
                             contentColor = Color.White
                         )
                     ) {
-                        Text(stringResource(R.string.saveStr))
+                        Text(
+                            stringResource(R.string.saveStr),
+                            color = Color.White
+                        )
                     }
                 }
             }
@@ -349,15 +376,24 @@ fun DialogProductDelete(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.deleteProductStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.deleteProductStr),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     buildAnnotatedString {
-                        append("${stringResource(R.string.wouldYouLikeDelProdStr)}:")
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("${productViewModel.productToEdit?.productName}?")
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold,
+                            color = Color.Black)) {
+                            append("${stringResource(R.string.wouldYouLikeDelProdStr)}:")
+                        }
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold,
+                            color = Color.Black)) {
+                            append(" ${productViewModel.productToEdit?.productName}?")
                         }
                     },
                     fontSize = 16.sp,
@@ -366,7 +402,8 @@ fun DialogProductDelete(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text("$numberGenerator")
+                Text("$numberGenerator",
+                    color = Color.Black,)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -384,7 +421,8 @@ fun DialogProductDelete(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancelStr))
+                        Text(stringResource(R.string.cancelStr),
+                            color = Color.Black)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(

@@ -2,6 +2,7 @@ package com.example.gastosapp.presentation.clients
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,7 +61,8 @@ fun ClientScreen(
     navHostController: NavHostController
 ) {
 
-    val clients: LazyPagingItems<ClientEntity> = clientViewModel.clientsPagedData.collectAsLazyPagingItems()
+    val clients: LazyPagingItems<ClientEntity> =
+        clientViewModel.clientsPagedData.collectAsLazyPagingItems()
 
     val context = LocalContext.current
 
@@ -94,7 +97,8 @@ fun ClientScreen(
                 clientViewModel,
                 context,
                 clients,
-                navHostController)
+                navHostController
+            )
         }
     }
 
@@ -178,7 +182,11 @@ fun ClientForm(
     clientViewModel: ClientViewModel,
     context: Context
 ) {
-    Text(text = stringResource(R.string.createClientStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    Text(
+        text = stringResource(R.string.createClientStr),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
+    )
 
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -199,7 +207,7 @@ fun ClientForm(
     Button(
         onClick = {
             if (clientViewModel.firstName.isEmpty()) {
-                Toast.makeText(context,messageValidation , Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, messageValidation, Toast.LENGTH_SHORT).show()
             } else {
                 clientViewModel.insertClient()
                 // clean values
@@ -216,7 +224,11 @@ fun ClientForm(
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Text(text = stringResource(R.string.saveStr), fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = stringResource(R.string.saveStr),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -281,12 +293,12 @@ fun ClientsList(
     ) {
         items(
             count = clients.itemCount,
-            key = clients.itemKey{ client -> client.id }
+            key = clients.itemKey { client -> client.id }
         ) { client ->
 
             val clientValue = clients[client]
 
-            if (clientValue != null){
+            if (clientValue != null) {
                 ClientItem(clientValue, openDialogDelete = {
                     clientViewModel.openDeleteDialog(clientValue)
                 }, openDialog = {
@@ -295,7 +307,6 @@ fun ClientsList(
 
                 Spacer(modifier = Modifier.height(8.dp))
             }
-
         }
     }
 }
@@ -318,7 +329,12 @@ fun DialogClientEdit(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.editClientStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.editClientStr),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -340,7 +356,8 @@ fun DialogClientEdit(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancelStr))
+                        Text(stringResource(R.string.cancelStr),
+                            color = Color.Black)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
 
@@ -389,19 +406,37 @@ fun DialogClientDelete(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
+
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.deleteClientStr), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.deleteClientStr),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     buildAnnotatedString {
-                        append(stringResource(R.string.WouldYouLikeDelStr))
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        withStyle(
+                            style = SpanStyle(
+                                color = Color.Black
+                            )
+                        ) {
+                            append(stringResource(R.string.WouldYouLikeDelStr))
+                        }
+
+                        withStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.Bold,
+                                color =  Color.Black
+                            )
+                        ) {
                             append(": ${viewModel.clientToEdit?.firstName} ${viewModel.clientToEdit?.lastName}?")
                         }
                     },
@@ -411,7 +446,7 @@ fun DialogClientDelete(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text("$numberGenerator")
+                Text("$numberGenerator", color = Color.Black)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -428,7 +463,8 @@ fun DialogClientDelete(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancelStr))
+                        Text(stringResource(R.string.cancelStr),
+                            color = Color.Black)
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
