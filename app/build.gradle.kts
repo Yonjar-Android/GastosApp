@@ -87,4 +87,12 @@ dependencies {
 
     //Compose Charts
     implementation(libs.android.compose.charts)
+
+    // Mockk
+    testImplementation(libs.mockk)
+
+    // Turbine
+    testImplementation(libs.turbine)
+
+    testImplementation(libs.kotlinx.coroutines.test)
 }
