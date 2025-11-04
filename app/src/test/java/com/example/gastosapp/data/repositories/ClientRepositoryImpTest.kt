@@ -42,7 +42,7 @@ class ClientRepositoryImpTest {
     }
 
     @Test
-    fun `insert function should be called one time and insert the client successfully`() = runTest {
+    fun insertFunction_shouldBeCalledOneTimeAndInsertTheClientSuccessfully() = runTest {
         // Given
         coEvery { clientDao.insert(client) } returns 1
 
@@ -55,7 +55,7 @@ class ClientRepositoryImpTest {
     }
 
     @Test
-    fun `update function should be called one time and update the client successfully`() = runTest {
+    fun updateFunction_shouldBeCalledOneTime_andUpdateTheClientSuccessfully() = runTest {
         // Given
         coEvery { clientDao.update(client) } returns Unit
 
@@ -67,7 +67,7 @@ class ClientRepositoryImpTest {
     }
 
     @Test
-    fun `delete function should be called one time and delete the client successfully`() = runTest {
+    fun deleteFunction_shouldBeCalledOneTime_andDeleteTheClientSuccessfully() = runTest {
 
         // Given
         coEvery { clientDao.delete(client) } returns Unit
@@ -80,7 +80,7 @@ class ClientRepositoryImpTest {
     }
 
     @Test
-    fun `getClientById should return a ClientEntity when the client is found`() = runTest {
+    fun getClientById_shouldReturnAClientEntity_whenTheClientIsFound() = runTest {
         // Given
         coEvery { clientDao.getClientById(1) } returns client
 
@@ -94,7 +94,7 @@ class ClientRepositoryImpTest {
     }
 
     @Test
-    fun `getClientById should return null when the client is not found`() = runTest {
+    fun getClientById_shouldReturnNull_whenTheClientIsNotFound() = runTest {
         // Given
         coEvery { clientDao.getClientById(1) } returns null
 
@@ -107,7 +107,7 @@ class ClientRepositoryImpTest {
     }
 
     @Test
-    fun `get all clients calls dao`() = runTest {
+    fun getAllClients_callsDao() = runTest {
         // Given
         val pagingSource = mockk<PagingSource<Int, ClientEntity>>()
         every { clientDao.getAllClients() } returns pagingSource
@@ -126,7 +126,7 @@ class ClientRepositoryImpTest {
     }
 
     @Test
-    fun `get all clients returns correct data from paging source`() = runTest {
+    fun getAllClients_returnsCorrectData_fromPagingSource() = runTest {
         // Given
         val clients = listOf(ClientEntity(1, "Juan", "Perez"))
         val pagingSource = FakeClientPagingSource(clients)

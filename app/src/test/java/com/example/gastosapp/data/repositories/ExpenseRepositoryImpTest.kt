@@ -60,7 +60,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `insert function should be called one time and insert the expense successfully`() =
+    fun insert_function_shouldBeCalledOnce_andInsertTheExpenseSuccessfully() =
         runTest {
             // Given
             coEvery { expenseDao.insert(expense) } returns 1
@@ -74,7 +74,7 @@ class ExpenseRepositoryImpTest {
         }
 
     @Test
-    fun `update function should be called one time and update the expense successfully`() =
+    fun updateFunction_shouldBeCalledOneTime_andUpdateTheExpenseSuccessfully() =
         runTest {
             // Given
             coEvery { expenseDao.update(expense) } returns Unit
@@ -87,7 +87,7 @@ class ExpenseRepositoryImpTest {
         }
 
     @Test
-    fun `delete function should be called one time and delete the expense successfully`() =
+    fun deleteFunction_shouldBeCalledOneTime_andDeleteTheExpenseSuccessfully() =
         runTest {
             // Given
             coEvery { expenseDao.delete(expense) } returns Unit
@@ -100,7 +100,7 @@ class ExpenseRepositoryImpTest {
         }
 
     @Test
-    fun `getExpenseById should return a ExpenseEntity when the expense is found`() = runTest {
+    fun getExpenseById_shouldReturnAExpenseEntity_whenTheExpenseIsFound() = runTest {
         // Given
         coEvery { expenseDao.getExpenseById(1) } returns expenseWithDetails
 
@@ -114,7 +114,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getExpenseById should return null when the expense is not found`() = runTest {
+    fun getExpenseById_shouldReturnNull_whenTheExpenseIsNotFound() = runTest {
         // Given
         coEvery { expenseDao.getExpenseById(1) } returns null
 
@@ -127,7 +127,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `get all expenses calls dao`() = runTest {
+    fun getAllExpenses_callsDao() = runTest {
         // Given
         val pagingSource = mockk<PagingSource<Int, ExpenseWithDetails>>()
         coEvery { expenseDao.getAllExpensesWithDetails() } returns pagingSource
@@ -147,7 +147,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `get all expenses returns correct data from paging source`() = runTest {
+    fun getAllExpenses_returnsCorrectData_fromPagingSource() = runTest {
         // Given
         val expenses = listOf<ExpenseWithDetails>(
             expenseWithDetails
@@ -172,7 +172,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getExpensesByClientId should call dao`() = runTest {
+    fun getExpensesByClientId_shouldCallDao() = runTest {
         // Given
         val pagingSource = mockk<PagingSource<Int, ExpenseWithDetails>>()
         coEvery { expenseDao.getExpensesByClientId(1) } returns pagingSource
@@ -192,7 +192,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getExpensesByClientId returns correct data from paging source`() = runTest {
+    fun getExpensesByClientId_returnsCorrectData_fromPagingSource() = runTest {
         // Given
         val expenses = listOf<ExpenseWithDetails>(
             expenseWithDetails
@@ -217,7 +217,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getPaymentByMonth should return a list of payments by month`() = runTest {
+    fun getPaymentByMonth_shouldReturnAList_ofPaymentsByMonth() = runTest {
         // Given
         val listOfPayments = listOf<Double>(
             0.0, 0.0, 120.0, 200.0, 300.0, 150.0,
@@ -251,7 +251,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getPaymentByMonth should return a list of 12 zeros when there are no payments`() = runTest {
+    fun getPaymentByMonth_shouldReturnAListOf12Zeros_whenThereAreNoPayments() = runTest {
         //Given
         coEvery { expenseDao.getPaymentsByMonth("2025") } returns emptyList()
         //When
@@ -264,7 +264,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getAvailableYears should return a list of available years`() = runTest {
+    fun getAvailableYears_shouldReturnAList_ofAvailableYears() = runTest {
         //Given
         val listOfYears = listOf<String>("2025","2024","2023")
         coEvery { expenseDao.getAvailableYears() } returns listOfYears
@@ -278,7 +278,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getAvailableYears should return an empty list when there are no available years`() = runTest {
+    fun getAvailableYears_shouldReturnAnEmptyList_whenThereAreNoAvailableYears() = runTest {
         //Given
         coEvery { expenseDao.getAvailableYears() } returns emptyList()
         //When
@@ -291,7 +291,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getCostsByMonth should return a list of costs by month`() = runTest {
+    fun getCostsByMonth_shouldReturnAList_ofCostsByMonth() = runTest {
         // Given
         val listOfCosts = listOf<Double>(
             0.0, 0.0, 120.0, 200.0, 300.0, 150.0,
@@ -325,7 +325,7 @@ class ExpenseRepositoryImpTest {
     }
 
     @Test
-    fun `getCostsByMonth should return an empty list when there are no costs`() = runTest {
+    fun getCostsByMonth_shouldReturnAnEmptyList_whenThereAreNoCosts() = runTest {
         // Given
 
         coEvery { expenseDao.getPaymentsByMonth("2025") } returns emptyList()

@@ -38,7 +38,7 @@ class ProductRepositoryImpTest {
     }
 
     @Test
-    fun `insert function should be called one time and insert the product successfully`() = runTest {
+    fun insertFunction_shouldBeCalledOneTime_andInsertTheProductSuccessfully() = runTest {
         //Given
         coEvery { productDao.insert(product) } returns 1
 
@@ -51,7 +51,7 @@ class ProductRepositoryImpTest {
     }
 
     @Test
-    fun `update function should be called one time and update the product successfully`() = runTest {
+    fun updateFunction_shouldBeCalledOneTime_andUpdateTheProductSuccessfully() = runTest {
         //Given
         coEvery { productDao.update(product) } returns Unit
 
@@ -63,7 +63,7 @@ class ProductRepositoryImpTest {
     }
 
     @Test
-    fun `delete function should be called one time and delete the product successfully`() = runTest {
+    fun deleteFunction_shouldBeCalledOneTime_andDeleteTheProductSuccessfully() = runTest {
 
         //Given
         coEvery { productDao.delete(product) } returns Unit
@@ -77,7 +77,7 @@ class ProductRepositoryImpTest {
     }
 
     @Test
-    fun `get all products calls dao`() = runTest {
+    fun getAllProducts_callsDao() = runTest {
         //Given
         val pagingSource = mockk<PagingSource<Int, ProductEntity>>()
         every { productDao.getAllProducts() } returns pagingSource
@@ -97,7 +97,7 @@ class ProductRepositoryImpTest {
     }
 
     @Test
-    fun `getAllProducts returns correct data from paging source`() = runTest {
+    fun getAllProducts_returnsCorrectData_fromPagingSource() = runTest {
         //Given
         val products = listOf(ProductEntity(1, "Recarga"),
             ProductEntity(2, "Gasolina"))
