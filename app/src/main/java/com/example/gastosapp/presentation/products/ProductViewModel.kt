@@ -21,6 +21,7 @@ class ProductViewModel @Inject constructor(
     val products: Flow<PagingData<ProductEntity>>
     = productRepository.getAllProducts()
         .cachedIn(viewModelScope)
+
     fun insertProduct(){
         viewModelScope.launch {
             productRepository.insertProduct(

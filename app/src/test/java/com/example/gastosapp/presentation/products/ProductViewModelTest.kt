@@ -16,10 +16,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -33,8 +35,12 @@ class ProductViewModelTest {
 
     val dispatcher = StandardTestDispatcher()
 
+    val product = ProductEntity(
+        productName = "Test Product"
+    )
+
     @Before
-    fun setUp(){
+    fun setUp() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(dispatcher)
         every { productRepository.getAllProducts() } returns flowOf(PagingData.empty())
@@ -42,13 +48,61 @@ class ProductViewModelTest {
     }
 
     @After
-    fun tearDown(){
+    fun tearDown() {
         Dispatchers.resetMain()
     }
 
-    /*@Test
-    fun `insertProduct should call repository insertProduct function`() = runTest {
+    @Test
+    fun insertProduct_shouldCallRepository_insertProductFunction() = runTest {
+        coEvery { productRepository.insertProduct(product) } just runs
 
-    }*/
+        viewModel.onProductNameChange("Test Product")
+        viewModel.insertProduct()
+        advanceUntilIdle()
+        assertEquals("Test Product", viewModel.productName)
+        coVerify(exactly = 1) { productRepository.insertProduct(product) }
+    }
 
+    @Test
+    fun updateProduct_shouldCallRepository_updateProductFunction() = runTest {
+        // Given
+        coEvery {
+            productRepository.updateProduct(
+                product
+                    .copy(productName = "Test Product2")
+            )
+        } just runs
+
+        // When
+        viewModel.openEditDialog(product)
+        viewModel.onProductNameEditChange("Test Product2")
+        viewModel.updateProduct()
+        advanceUntilIdle()
+
+        //Then
+        coVerify(exactly = 1) {
+            productRepository.updateProduct(
+                product
+                    .copy(productName = "Test Product2")
+            )
+        }
+        assertEquals("Test Product2", viewModel.productNameEdit)
+
+    }
+
+    @Test
+    fun deleteProduct_shouldCallRepository_deleteProductFunction() = runTest {
+        // Given
+        coEvery { productRepository.deleteProduct(product) } just runs
+
+        //When
+        viewModel.openDeleteDialog(product)
+        viewModel.deleteProduct()
+        advanceUntilIdle()
+
+        //Then
+        coVerify(exactly = 1) { productRepository.deleteProduct(product) }
+
+    }
 }
+
